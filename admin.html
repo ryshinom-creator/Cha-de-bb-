@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="styles.css">
 <style>
 body{padding:25px}.admin{max-width:1000px;margin:auto}.admin-card{background:#091a33;border:1px solid #4bb6dc33;border-radius:25px;padding:25px;margin-bottom:18px;box-shadow:0 15px 45px #0008}
-.admin h1{font-size:34px}.row{display:flex;gap:10px}.row>*{flex:1}.stat{display:inline-block;padding:15px 20px;border-radius:15px;background:#06172c;margin:5px}.stat b{font-size:25px;color:#70d0f5;display:block}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:12px;border-bottom:1px solid #ffffff12;text-align:left;font-size:13px}th{color:#70d0f5;font-family:Orbitron;font-size:10px}.yes{color:#71e2b0}.no{color:#ff9eaa}.danger{background:#7d3543}.msg{min-height:22px;color:#71e2b0}
+.admin h1{font-size:34px}.row{display:flex;gap:10px}.row>*{flex:1}.stat{display:inline-block;padding:15px 20px;border-radius:15px;background:#06172c;margin:5px}.stat b{font-size:25px;color:#70d0f5;display:block}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:12px;border-bottom:1px solid #ffffff12;text-align:left;font-size:13px}th{color:#70d0f5;font-family:Orbitron;font-size:10px}.yes{color:#71e2b0}.no{color:#ff9eaa}.danger{background:#7d3543}.msg{min-height:22px;color:#71e2b0;margin-top:10px;}
 .btn-gps{background:#1d6fa5;color:#fff;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;font-weight:bold;margin-top:8px;margin-bottom:10px;display:inline-block;}
 .btn-gps:hover{background:#2884c3;}
 </style></head>
@@ -60,7 +60,7 @@ function pegarGps(){
       }
       msg.textContent="📍 GPS obtido com sucesso! Clique em 'PUBLICAR LOCALIZAÇÃO' para enviar.";
     }, err=>{
-      msg.textContent="❌ Erro ao acessar GPS. Ative a localização no seu aparelho e tente novamente.";
+      msg.textContent="❌ Erro ao acessar GPS. Ative a localização no seu aparelho.";
     });
   } else {
     msg.textContent="❌ Aparelho sem suporte a GPS.";
@@ -89,7 +89,7 @@ async function loadRsvps(){
     const yes=d.items.filter(x=>x.attending==="sim"),no=d.items.filter(x=>x.attending==="nao");
     document.getElementById("stats").innerHTML=`<span class="stat">Confirmados<b>${yes.length}</b></span><span class="stat">Não vão<b>${no.length}</b></span><span class="stat">Pessoas<b>${yes.reduce((s,x)=>s+Number(x.guests||1),0)}</b></span>`;
     document.getElementById("tbody").innerHTML=d.items.map(x=>`<tr><td>${esc(x.name)}</td><td class="${x.attending==="sim"?"yes":"no"}">${x.attending==="sim"?"SIM 🚀":"NÃO 🌙"}</td><td>${x.guests||0}</td><td>${esc(x.message||"")}</td><td>${esc(x.date||"")}</td></tr>`).join("");
-  }catch(e){alert("Erro ao carregar lista. Verifique a senha digitada no topo da página.")}
+  }catch(e){alert("Erro ao carregar lista. Verifique a senha digitada.")}
 }
 
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
