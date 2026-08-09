@@ -6,53 +6,135 @@
 <link rel="stylesheet" href="styles.css">
 <style>
 body{padding:25px}.admin{max-width:1000px;margin:auto}.admin-card{background:#091a33;border:1px solid #4bb6dc33;border-radius:25px;padding:25px;margin-bottom:18px;box-shadow:0 15px 45px #0008}
-.admin h1{font-size:34px}.row{display:flex;gap:10px}.row>*{flex:1}.stat{display:inline-block;padding:15px 20px;border-radius:15px;background:#06172c;margin:5px}.stat b{font-size:25px;color:#70d0f5;display:block}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:12px;border-bottom:1px solid #ffffff12;text-align:left;font-size:13px}th{color:#70d0f5;font-family:Orbitron;font-size:10px}.yes{color:#71e2b0}.no{color:#ff9eaa}.danger{background:#7d3543}.msg{min-height:22px;color:#71e2b0}
-</style></head>
+.admin h1{font-size:34px}.row{display:flex;gap:10px}.row>*{flex:1}.stat{display:inline-block;padding:15px 20px;border-radius:15px;background:#06172c;margin:5px}.stat b{font-size:25px;color:#70d0f5;display:block}.table-wrap{overflow:auto}th,td{padding:12px;border-bottom:1px solid #ffffff12;text-align:left;font-size:13px}th{color:#70d0f5;font-family:Orbitron;font-size:10px}.yes{color:#71e2b0}.no{color:#ff9eaa}.msg{min-height:22px;color:#71e2b0;margin-top:10px}
+</style>
+</head>
 <body>
 <div class="admin">
   <div class="admin-card">
-    <div class="mini-label">🚀 CENTRAL DE COMANDO</div>
-    <h1>Painel ADM — Aydan</h1>
-    <p>Área do organizador. O endereço e as confirmações ficam aqui.</p>
+    <div class="mini-label">🔐 AUTENTICAÇÃO ADM</div>
+    <h1>CENTRAL DE COMANDO</h1>
+    <p>Insira sua senha para gerenciar a localização e os convidados.</p>
     <label>Senha administrativa</label>
-    <input id="password" type="password" placeholder="Digite sua senha">
+    <input id="password" type="password" placeholder="Digite sua senha" onchange="loadAdminData()">
+    <button onclick="loadAdminData()">CARREGAR PAINEL</button>
   </div>
 
   <div class="admin-card">
-    <h2>📍 Liberar localização</h2>
-    <p>Coloque o link do Google Maps ou outro link de localização.</p>
-    <input id="link" placeholder="https://maps.google.com/...">
-    <input id="locationText" placeholder="Ex.: Estamos te esperando! Toque para abrir a localização.">
-    <button onclick="saveLocation()">PUBLICAR LOCALIZAÇÃO</button>
+    <h2>📍 LOCALIZAÇÃO DO EVENTO</h2>
+    <p>Localização atual:</p>
+    <p><a id="current-link" href="#" target="_blank" style="color:var(--cyan);word-break:break-all;">Carregando...</a></p>
+    
+    <div style="margin-top:20px;">
+      <label>Cole aqui o link da localização:</label>
+      <input type="text" id="input-loc" placeholder="https://maps.google.com/..." />
+      <button onclick="salvarLocalizacao()">[ 💾 SALVAR LOCALIZAÇÃO ]</button>
+    </div>
     <p id="locationMsg" class="msg"></p>
   </div>
 
   <div class="admin-card">
-    <h2>👨‍🚀 Lista de convidados</h2>
-    <button onclick="loadRsvps()">ATUALIZAR LISTA</button>
+    <h2>👨‍👩‍👧 Lista de convidados e confirmações</h2>
+    <button onclick="loadAdminData()">ATUALIZAR DADOS</button>
     <div id="stats"></div>
-    <div class="table-wrap"><table><thead><tr><th>NOME</th><th>RESPOSTA</th><th>PESSOAS</th><th>MENSAGEM</th><th>DATA</th></tr></thead><tbody id="tbody"></tbody></table></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>NOME</th><th>RESPOSTA</th><th>PESSOAS</th><th>MENSAGEM</th><th>DATA</th></tr></thead>
+        <tbody id="tbody"><tr><td colspan="5">Digite a senha acima para carregar.</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </div>
+
 <script>
-const API_URL="";
-async function call(payload){
-  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
-  return await r.json();
+// COLE AQUI A URL /exec DO SEU GOOGLE APPS SCRIPT
+const API_URL = "";
+
+async function loadAdminData() {
+  const pwd = document.getElementById("password").value;
+  if(!API_URL) {
+    alert("Por favor, configure a variável API_URL no admin.html com a URL do seu Google Apps Script.");
+    return;
+  }
+  
+  // 1. Carregar localização atual
+  try {
+    const rLoc = await fetch(API_URL + "?action=getLoc");
+    const dLoc = await rLoc.json();
+    if(dLoc.ok) {
+      const linkEl = document.getElementById("current-link");
+      linkEl.innerText = dLoc.localizacao || "Nenhuma localização definida";
+      linkEl.href = dLoc.localizacao || "#";
+      document.getElementById("input-loc").value = dLoc.localizacao || "";
+    }
+  } catch(e) {
+    console.error("Erro ao buscar localização", e);
+  }
+
+  // 2. Carregar lista de RSVPs
+  try {
+    const rList = await fetch(API_URL + "?action=list&password=" + encodeURIComponent(pwd));
+    const dList = await rList.json();
+    if(!dList.ok) {
+      alert(dList.error || "Erro ao carregar lista.");
+      return;
+    }
+    const yes = dList.items.filter(x => x.attending === "sim");
+    const no = dList.items.filter(x => x.attending === "nao");
+    
+    document.getElementById("stats").innerHTML = `
+      <span class="stat">Confirmados<b>${yes.length}</b></span>
+      <span class="stat">Não vão<b>${no.length}</b></span>
+      <span class="stat">Total Pessoas<b>${yes.reduce((s,x)=>s+Number(x.guests||1),0)}</b></span>
+    `;
+    
+    document.getElementById("tbody").innerHTML = dList.items.map(x => `
+      <tr>
+        <td>${esc(x.name)}</td>
+        <td class="${x.attending==="sim"?"yes":"no"}">${x.attending==="sim"?"SIM 🚀":"NÃO 🌙"}</td>
+        <td>${x.guests||0}</td>
+        <td>${esc(x.message||"")}</td>
+        <td>${esc(x.date||"")}</td>
+      </tr>
+    `).join("");
+  } catch(e) {
+    console.error("Erro ao carregar lista de convidados", e);
+  }
 }
-async function saveLocation(){
-  const msg=document.getElementById("locationMsg"); msg.textContent="Publicando...";
-  try{const d=await call({action:"setLocation",password:document.getElementById("password").value,link:document.getElementById("link").value,text:document.getElementById("locationText").value});msg.textContent=d.ok?"📍 Localização publicada!":"❌ "+d.error}catch(e){msg.textContent="❌ Verifique a URL do Apps Script."}
+
+async function salvarLocalizacao() {
+  const pwd = document.getElementById("password").value;
+  const novaLoc = document.getElementById("input-loc").value.trim();
+  const msg = document.getElementById("locationMsg");
+  
+  if(!API_URL) {
+    alert("API_URL não configurada.");
+    return;
+  }
+  
+  msg.textContent = "Salvando localização...";
+  
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "saveLoc", password: pwd, localizacao: novaLoc })
+    });
+    const data = await res.json();
+    if(data.ok) {
+      msg.textContent = "✅ Localização salva com sucesso!";
+      loadAdminData();
+    } else {
+      msg.textContent = "❌ " + (data.error || "Erro ao salvar.");
+    }
+  } catch(e) {
+    msg.textContent = "❌ Erro de conexão ao salvar.";
+  }
 }
-async function loadRsvps(){
-  try{
-    const r=await fetch(API_URL+"?action=list&password="+encodeURIComponent(document.getElementById("password").value));
-    const d=await r.json(); if(!d.ok){alert(d.error);return}
-    const yes=d.items.filter(x=>x.attending==="sim"),no=d.items.filter(x=>x.attending==="nao");
-    document.getElementById("stats").innerHTML=`<span class="stat">Confirmados<b>${yes.length}</b></span><span class="stat">Não vão<b>${no.length}</b></span><span class="stat">Pessoas<b>${yes.reduce((s,x)=>s+Number(x.guests||1),0)}</b></span>`;
-    document.getElementById("tbody").innerHTML=d.items.map(x=>`<tr><td>${esc(x.name)}</td><td class="${x.attending==="sim"?"yes":"no"}">${x.attending==="sim"?"SIM 🚀":"NÃO 🌙"}</td><td>${x.guests||0}</td><td>${esc(x.message||"")}</td><td>${esc(x.date||"")}</td></tr>`).join("");
-  }catch(e){alert("Configure a URL do Apps Script no admin.html.")}
+
+function esc(s){
+  return String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 </script>
-</body></html>
+</body>
+</html>
