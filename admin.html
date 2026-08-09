@@ -1,33 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Chá de Bebê do Aydan</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel ADM — Missão Aydan</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+body{padding:25px}.admin{max-width:1000px;margin:auto}.admin-card{background:#091a33;border:1px solid #4bb6dc33;border-radius:25px;padding:25px;margin-bottom:18px;box-shadow:0 15px 45px #0008}
+.admin h1{font-size:34px}.row{display:flex;gap:10px}.row>*{flex:1}.stat{display:inline-block;padding:15px 20px;border-radius:15px;background:#06172c;margin:5px}.stat b{font-size:25px;color:#70d0f5;display:block}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:12px;border-bottom:1px solid #ffffff12;text-align:left;font-size:13px}th{color:#70d0f5;font-family:Orbitron;font-size:10px}.yes{color:#71e2b0}.no{color:#ff9eaa}.danger{background:#7d3543}.msg{min-height:22px;color:#71e2b0}
+.btn-gps{background:#1d6fa5;color:#fff;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;font-weight:bold;margin-top:8px;margin-bottom:10px;display:inline-block;}
+.btn-gps:hover{background:#2884c3;}
+</style></head>
 <body>
-    <!-- SCRIPT DE SENHA NO TOPO DA PÁGINA -->
-    <script>
-        const senha = prompt("Digite a senha do painel Admin:");
-        if (senha !== "aydan1234") {
-            alert("Senha incorreta! Acesso negado.");
-            window.location.href = "index.html";
-        }
-    </script>
+<div class="admin">
+  <div class="admin-card">
+    <div class="mini-label">🚀 CENTRAL DE COMANDO</div>
+    <h1>Painel ADM — Aydan</h1>
+    <p>Área do organizador. O endereço e as confirmações ficam aqui.</p>
+    <label>Senha administrativa</label>
+    <input id="password" type="password" placeholder="Digite sua senha">
+  </div>
 
-    <div class="container">
-        <h1>Painel de Controle ⚙️</h1>
-        <p>Bem-vindo ao painel do Chá de Bebê do Aydan.</p>
-        
-        <div class="card">
-            <h2>📍 Configurar Localização</h2>
-            <p>Clique no botão abaixo estando no local do evento para salvar a localização. Ela será atualizada automaticamente para os convidados.</p>
-            <button id="btn-localizacao" class="btn">Adicionar Minha Localização Atual</button>
-            <div id="resultado-mapa" style="margin-top: 15px;"></div>
-        </div>
-    </div>
+  <div class="admin-card">
+    <h2>📍 Liberar localização</h2>
+    <p>Coloque o link do Google Maps ou clique no botão para capturar a localização atual pelo GPS.</p>
+    
+    <button type="button" class="btn-gps" onclick="pegarGps()">📡 USAR MEU GPS ATUAL</button>
+    
+    <input id="link" placeholder="https://maps.google.com/...">
+    <input id="locationText" placeholder="Ex.: Estamos te esperando! Toque para abrir a localização.">
+    <button onclick="saveLocation()">PUBLICAR LOCALIZAÇÃO</button>
+    <p id="locationMsg" class="msg"></p>
+  </div>
 
-    <script src="script.js"></script>
+  <div class="admin-card">
+    <h2>👨‍🚀 Lista de convidados</h2>
+    <button onclick="loadRsvps()">ATUALIZAR LISTA</button>
+    <div id="stats"></div>
+    <div class="table-wrap"><table><thead><tr><th>NOME</th><th>RESPOSTA</th><th>PESSOAS</th><th>MENSAGEM</th><th>DATA</th></tr></thead><tbody id="tbody"></tbody></table></div>
+  </div>
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbzRyEtUbEfFxPo6ADqQjDLkW-m8Dd_zgB5bS8iIat6JPP8UvKKSmZHOC3RKp5kxKCyl/exec";
+
+async function call(payload){
+  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+  return await r.json();
+}
+
+function pegarGps(){
+  const msg=document.getElementById("locationMsg");
+  if(navigator.geolocation){
+    msg.textContent="Buscando coordenadas pelo GPS...";
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const lat=pos.coords.latitude, lon=pos.coords.longitude;
+      document.getElementById("link").value=`https://www.google.com/maps?q=${lat},${lon}`;
+      if(!document.getElementById("locationText").value){
+        document.getElementById("locationText").value="Localização liberada! Toque para abrir a rota no mapa.";
+      }
+      msg.textContent="📍 GPS obtido com sucesso! Clique em 'PUBLICAR LOCALIZAÇÃO' para enviar.";
+    }, err=>{
+      msg.textContent="❌ Erro ao acessar GPS. Ative a localização no seu aparelho e tente novamente.";
+    });
+  } else {
+    msg.textContent="❌ Aparelho sem suporte a GPS.";
+  }
+}
+
+async function saveLocation(){
+  const msg=document.getElementById("locationMsg"); msg.textContent="Publicando...";
+  try{
+    const d=await call({
+      action:"setLocation",
+      password:document.getElementById("password").value,
+      link:document.getElementById("link").value,
+      text:document.getElementById("locationText").value
+    });
+    msg.textContent=d.ok?"📍 Localização publicada com sucesso!":"❌ "+(d.error||"Erro ao publicar");
+  }catch(e){
+    msg.textContent="❌ Erro ao enviar. Verifique se a senha foi preenchida corretamente.";
+  }
+}
+
+async function loadRsvps(){
+  try{
+    const r=await fetch(API_URL+"?action=list&password="+encodeURIComponent(document.getElementById("password").value));
+    const d=await r.json(); if(!d.ok){alert(d.error||"Erro ao carregar lista");return}
+    const yes=d.items.filter(x=>x.attending==="sim"),no=d.items.filter(x=>x.attending==="nao");
+    document.getElementById("stats").innerHTML=`<span class="stat">Confirmados<b>${yes.length}</b></span><span class="stat">Não vão<b>${no.length}</b></span><span class="stat">Pessoas<b>${yes.reduce((s,x)=>s+Number(x.guests||1),0)}</b></span>`;
+    document.getElementById("tbody").innerHTML=d.items.map(x=>`<tr><td>${esc(x.name)}</td><td class="${x.attending==="sim"?"yes":"no"}">${x.attending==="sim"?"SIM 🚀":"NÃO 🌙"}</td><td>${x.guests||0}</td><td>${esc(x.message||"")}</td><td>${esc(x.date||"")}</td></tr>`).join("");
+  }catch(e){alert("Erro ao carregar lista. Verifique a senha digitada no topo da página.")}
+}
+
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+</script>
 </body>
 </html>
