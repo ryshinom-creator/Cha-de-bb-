@@ -1,6 +1,6 @@
 // --- CONFIGURAÇÃO DO BACKEND ---
-// Cole a URL do seu Google Apps Script aqui depois de publicar!
-const URL_API = ""; 
+// Sua URL do Google Apps Script já está aqui!
+const URL_API = "https://script.google.com/macros/s/AKfycbzRyEtUbEfFxPo6ADqQjDLkW-m8Dd_zgB5bS8iIat6JPP8UvKKSmZHOC3RKp5kxKCyl/exec"; 
 
 // ==========================================
 // LÓGICA DO PAINEL ADMIN (admin.html)
@@ -19,12 +19,12 @@ if (btnLocalizacao) {
                     const lon = posicao.coords.longitude;
                     const linkGoogleMaps = `https://www.google.com/maps?q=${lat},${lon}`;
                     
-                    resultadoMapa.innerHTML = "<p>Salvando localização para os convidados...</p>";
+                    resultadoMapa.innerHTML = "<p>Salvando localização na base de dados (Google Sheets)...</p>";
                     
-                    // Salvamento temporário no navegador (funciona na hora sem configurar banco)
+                    // Salvamento temporário no navegador
                     localStorage.setItem('linkMapaAydan', linkGoogleMaps);
 
-                    // Se a URL do Google Script estiver configurada, envia para a planilha
+                    // Envia a localização para a sua planilha do Google
                     if (URL_API !== "") {
                         try {
                             await fetch(URL_API, {
@@ -39,8 +39,8 @@ if (btnLocalizacao) {
                     }
                     
                     resultadoMapa.innerHTML = `
-                        <p style="color: green;">✅ Localização salva com sucesso!</p>
-                        <a href="${linkGoogleMaps}" target="_blank" class="link-mapa">📍 Testar Localização</a>
+                        <p style="color: green;">✅ Localização salva com sucesso na nuvem!</p>
+                        <a href="${linkGoogleMaps}" target="_blank" class="link-mapa" style="display:inline-block; margin-top:10px; padding:10px; background:#2196F3; color:white; text-decoration:none; border-radius:5px;">📍 Testar Localização</a>
                     `;
                 },
                 (erro) => {
@@ -54,14 +54,16 @@ if (btnLocalizacao) {
 }
 
 // ==========================================
-// LÓGICA DA PÁGINA DOS CONVIDADOS (index.html)
+// LÓGICA DA PÁGINA DOS CONVIDADOS (TEMA ASTRONAUTA)
 // ==========================================
-const areaLocalizacao = document.getElementById('area-localizacao');
-if (areaLocalizacao) {
+const locationText = document.getElementById('locationText');
+const locationButton = document.getElementById('locationButton');
+
+if (locationText && locationButton) {
     async function carregarLocalizacao() {
         let linkEncontrado = null;
 
-        // Tenta buscar da Planilha do Google primeiro (se estiver configurada)
+        // Tenta buscar da Planilha do Google
         if (URL_API !== "") {
             try {
                 const response = await fetch(URL_API + "?action=getLocation");
@@ -74,21 +76,16 @@ if (areaLocalizacao) {
             }
         }
 
-        // Se não achou na planilha, busca na memória do navegador
+        // Se não achou na planilha, busca na memória local do celular/pc
         if (!linkEncontrado) {
             linkEncontrado = localStorage.getItem('linkMapaAydan');
         }
 
-        // Exibe o botão se encontrou um link
+        // Se o link foi encontrado no Google Sheets, ativa o botão do Astronauta!
         if (linkEncontrado) {
-            areaLocalizacao.innerHTML = `
-                <p>A localização do Chá de Bebê já está definida!</p>
-                <a href="${linkEncontrado}" target="_blank" class="link-mapa">
-                    📍 Clique aqui para abrir a rota no mapa
-                </a>
-            `;
-        } else {
-            areaLocalizacao.innerHTML = "<p>A localização do evento ainda não foi definida. Volte mais tarde!</p>";
+            locationText.innerText = "Localização liberada! Pressione o botão abaixo para abrir a rota intergaláctica.";
+            locationButton.href = linkEncontrado;
+            locationButton.classList.remove("disabled");
         }
     }
 
