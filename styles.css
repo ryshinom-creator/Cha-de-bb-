@@ -1,66 +1,188 @@
-/* Estilos básicos para manter o site bonito e organizado */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
-    color: #333;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
+:root {
+  --bg: #07152f;
+  --panel: #091a33;
+  --accent: #4bb6dc;
+  --accent-light: #70d0f5;
+  --text: #e2e8f0;
+  --border: rgba(75, 182, 220, 0.2);
 }
 
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* Fundo Espacial */
+.stars {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%);
+  z-index: -2;
+}
+
+header.hero {
+  text-align: center;
+  padding: 60px 20px 30px;
+  position: relative;
+}
+
+.astronaut {
+  font-size: 70px;
+  margin-bottom: 15px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+.eyebrow {
+  color: var(--accent-light);
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 h1 {
-    color: #4a90e2;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 0 15px rgba(112, 208, 245, 0.5);
+  letter-spacing: 3px;
 }
 
-h2 {
-    color: #333;
-    font-size: 1.2em;
+.baby-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  color: var(--accent-light);
+  margin: 15px 0;
 }
 
-.card {
-    margin-top: 25px;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fafafa;
+.orbit-line { color: var(--accent); margin: 20px 0; }
+.subtitle { font-size: 1.1rem; color: #cbd5e1; }
+
+.mission-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 1px solid var(--border);
+  margin-top: 20px;
 }
 
-.btn {
-    padding: 12px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 10px;
+main { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+/* Cartões de Informação */
+.info-section {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
 }
 
-.btn:hover {
-    background-color: #45a049;
+.info-card {
+  flex: 1;
+  min-width: 140px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-a.link-mapa {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 12px 20px;
-    background-color: #2196F3;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
+.info-icon { font-size: 30px; margin-bottom: 10px; }
+.info-card small { display: block; color: var(--accent-light); font-size: 11px; font-weight: 700; margin-bottom: 5px; }
+.info-card strong { font-size: 16px; }
+
+/* Formulário RSVP e Painéis */
+.panel, .location-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 35px 25px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
-a.link-mapa:hover {
-    background-color: #1976D2;
+.section-head h2 { color: #fff; font-family: 'Orbitron', sans-serif; margin-bottom: 10px; }
+.rocket { font-size: 40px; margin-bottom: 10px; }
+
+form { text-align: left; margin-top: 25px; }
+label { display: block; font-size: 14px; font-weight: 600; margin: 15px 0 8px; color: var(--accent-light); }
+label span { font-weight: normal; color: #888; font-size: 12px; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #020c1b;
+  color: #fff;
+  font-family: inherit;
+  box-sizing: border-box;
 }
+
+.choices { display: flex; gap: 15px; }
+.choice {
+  flex: 1;
+  background: #020c1b;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  padding: 15px 5px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.choice input { display: none; }
+.choice:hover { border-color: var(--accent); }
+.choice:has(input:checked) { background: rgba(75,182,220,0.15); border-color: var(--accent-light); }
+
+button {
+  width: 100%;
+  background: #1d6fa5;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+button:hover { background: #2884c3; }
+
+/* Localização */
+.map-orbit { font-size: 50px; margin-bottom: 15px; }
+.mini-label { color: var(--accent-light); font-size: 12px; font-weight: bold; letter-spacing: 2px; }
+.location h2 { font-family: 'Orbitron', sans-serif; margin: 10px 0; }
+.location-btn {
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  background: #1d6fa5;
+  color: #fff;
+  text-decoration: none;
+  padding: 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+.location-btn.disabled { background: #333; opacity: 0.6; pointer-events: none; }
+
+.final { text-align: center; padding: 40px 20px; }
+.planet-icon { font-size: 50px; }
+footer { text-align: center; padding: 20px; font-size: 12px; color: #555; letter-spacing: 2px; }
