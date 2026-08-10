@@ -224,42 +224,50 @@ document.addEventListener("visibilitychange", function () {
 
 /* ------------------------- fraldas ---------------------------- */
 /**
- * Cada aparelho recebe UM tamanho e fica com ele para sempre.
- * O tamanho é sorteado na primeira visita e guardado no navegador
- * (localStorage), então recarregar a página ou voltar outro dia
- * mostra sempre o mesmo. Isso não identifica a pessoa: é só uma
- * marquinha no aparelho, sem nome nem cadastro.
+ * O tamanho vem da planilha, em rodízio: 1º visitante M, 2º G, 3º GG,
+ * 4º M de novo. Assim o equilíbrio é real entre todos os convidados.
+ * Depois de recebido, fica guardado no aparelho e não muda mais.
  */
 const TAMANHOS = ["M", "G", "GG"];
 const CHAVE_FRALDA = "aydan_fralda_tamanho";
 
-function definirFralda() {
+function mostrarFralda(tamanho, jaTinha) {
   const alvo = document.getElementById("diaperSize");
   const nota = document.getElementById("diaperNote");
-  if (!alvo) return;
-
-  let tamanho = null;
-  let primeiraVez = false;
-
-  try {
-    tamanho = localStorage.getItem(CHAVE_FRALDA);
-    if (TAMANHOS.indexOf(tamanho) === -1) tamanho = null;
-    if (!tamanho) {
-      tamanho = TAMANHOS[Math.floor(Math.random() * TAMANHOS.length)];
-      localStorage.setItem(CHAVE_FRALDA, tamanho);
-      primeiraVez = true;
-    }
-  } catch (e) {
-    // navegador sem armazenamento (ou aba anônima): sorteia só para exibir
-    tamanho = TAMANHOS[Math.floor(Math.random() * TAMANHOS.length)];
-    primeiraVez = true;
-  }
-
-  alvo.textContent = tamanho;
-
-  if (nota && !primeiraVez) {
+  if (alvo) alvo.textContent = tamanho;
+  if (nota && jaTinha) {
     nota.textContent = "Este é o seu tamanho e ele não muda mais — pode conferir quantas vezes quiser.";
   }
+}
+
+async function definirFralda() {
+  if (!document.getElementById("diaperSize")) return;
+
+  // já recebeu antes neste aparelho?
+  let guardado = null;
+  try {
+    guardado = localStorage.getItem(CHAVE_FRALDA);
+    if (TAMANHOS.indexOf(guardado) === -1) guardado = null;
+  } catch (e) { guardado = null; }
+
+  if (guardado) { mostrarFralda(guardado, true); return; }
+
+  // primeira visita: pede o próximo tamanho do rodízio
+  if (API_URL) {
+    try {
+      const r = await fetch(API_URL + "?action=fralda&t=" + Date.now());
+      const d = await r.json();
+      if (d && d.ok && TAMANHOS.indexOf(d.tamanho) >= 0) {
+        try { localStorage.setItem(CHAVE_FRALDA, d.tamanho); } catch (e) {}
+        mostrarFralda(d.tamanho, false);
+        return;
+      }
+    } catch (e) { /* sem internet ou backend antigo: cai no sorteio local */ }
+  }
+
+  const sorteado = TAMANHOS[Math.floor(Math.random() * TAMANHOS.length)];
+  try { localStorage.setItem(CHAVE_FRALDA, sorteado); } catch (e) {}
+  mostrarFralda(sorteado, false);
 }
 
 definirFralda();
