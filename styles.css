@@ -40,3 +40,28 @@ button{width:100%;margin-top:20px;border:0;border-radius:14px;padding:16px;backg
 
 /* o atributo hidden precisa vencer o display dos blocos acima */
 [hidden]{display:none!important}
+
+/* --- briefing da missão: fraldas, traje de banho e bebidas --- */
+.briefing{max-width:900px;margin:0 auto 45px;padding:0 20px}
+.mission-card{background:linear-gradient(160deg,#0d2440,#091a33);border:1px solid #4bb6dc33;border-radius:25px;padding:26px;text-align:center;box-shadow:0 15px 40px #0006}
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.mission-card h3{font-family:"Playfair Display",serif;font-size:21px;margin:10px 0 8px;color:#fff}
+.mission-card p{color:#b9cfe0;font-size:14px;line-height:1.65;margin:0}
+.mission-card b{color:#8de4ff}
+.mission-icon{font-size:36px;line-height:1}
+.mission-tag{display:inline-block;font-family:Orbitron;font-size:9px;letter-spacing:.18em;padding:6px 14px;border-radius:99px;background:#0b2a43;color:#8de4ff;margin-bottom:14px}
+
+.diaper-card{position:relative;overflow:hidden;border-color:#4bb6dc66;box-shadow:0 20px 55px #1d8db033}
+.diaper-card::after{content:"";position:absolute;inset:-40% -10% auto;height:75%;background:radial-gradient(ellipse at top,#4bb6dc2e,transparent 70%);pointer-events:none}
+.diaper-emoji{font-size:44px;animation:float 4s ease-in-out infinite}
+.diaper-lead{font-size:15px!important;color:#dff7ff!important;margin-top:10px!important}
+.diaper-size{font-family:Orbitron;font-weight:700;font-size:74px;line-height:1.05;letter-spacing:.06em;margin:6px 0 12px;
+  background:linear-gradient(135deg,#a8ecff,#4bb6dc 55%,#2f8fc7);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:#8de4ff;text-shadow:0 0 42px #4bb6dc55}
+.diaper-note{font-size:12.5px!important;color:#8fa9bd!important;max-width:430px;margin:0 auto!important}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@media(max-width:650px){
+  .mission-grid{grid-template-columns:1fr}
+  .diaper-size{font-size:60px}
+  .mission-card{padding:22px}
+}

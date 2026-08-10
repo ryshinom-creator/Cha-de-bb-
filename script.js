@@ -221,3 +221,47 @@ setInterval(carregarLocalizacao, INTERVALO_CHECAGEM);
 document.addEventListener("visibilitychange", function () {
   if (!document.hidden) carregarLocalizacao();
 });
+
+/* ------------------------- fraldas ---------------------------- */
+/**
+ * Sorteia o tamanho da fralda a cada abertura do site.
+ * Em vez de sortear solto (o que faria muita gente cair no mesmo tamanho),
+ * cada aparelho recebe uma ordem embaralhada dos três tamanhos e vai
+ * percorrendo essa ordem a cada visita. Assim os tamanhos ficam equilibrados
+ * entre os convidados, e quem abre de novo recebe um tamanho diferente.
+ */
+const TAMANHOS = ["M", "G", "GG"];
+
+function sortearFralda() {
+  const alvo = document.getElementById("diaperSize");
+  if (!alvo) return;
+
+  let ordem, passo;
+  try {
+    ordem = JSON.parse(localStorage.getItem("aydan_fralda_ordem") || "null");
+    if (!Array.isArray(ordem) || ordem.length !== TAMANHOS.length) {
+      ordem = TAMANHOS.slice();
+      for (let i = ordem.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = ordem[i]; ordem[i] = ordem[j]; ordem[j] = t;
+      }
+      localStorage.setItem("aydan_fralda_ordem", JSON.stringify(ordem));
+    }
+    passo = parseInt(localStorage.getItem("aydan_fralda_passo") || "0", 10) || 0;
+    localStorage.setItem("aydan_fralda_passo", String(passo + 1));
+  } catch (e) {
+    // navegador sem armazenamento: sorteia na hora
+    ordem = TAMANHOS;
+    passo = Math.floor(Math.random() * TAMANHOS.length);
+  }
+
+  const tamanho = ordem[passo % ordem.length];
+  alvo.textContent = tamanho;
+
+  const nota = document.getElementById("diaperNote");
+  if (nota && passo > 0) {
+    nota.textContent = "Este é um tamanho novo para você — se já trouxe outro antes, qualquer um dos três ajuda muito!";
+  }
+}
+
+sortearFralda();
