@@ -126,23 +126,74 @@ function mostrarBloqueada() {
   locationActions.hidden = true;
   locationLocked.hidden = false;
   autoOpen.hidden = true;
+  if (typeof pararContagem === "function") pararContagem();
+  if (observador) { observador.disconnect(); observador = null; }
+}
+
+/**
+ * Abertura automática da rota.
+ * Só entra em contagem quando o convidado está de fato parado olhando o bloco de
+ * localização — se ele estiver rolando a página, nada acontece. Rolar para longe
+ * cancela a contagem, e cancelar à mão vale para o resto do dia.
+ */
+let observador = null;
+let timerContagem = null;
+let timerEspera = null;
+
+function jaResolvidoHoje() {
+  return !!localStorage.getItem(chaveDoDia());
+}
+
+function pararContagem() {
+  clearInterval(timerContagem);
+  clearTimeout(timerEspera);
+  timerContagem = null;
+  timerEspera = null;
+  contagemAtiva = false;
+  autoOpen.hidden = true;
 }
 
 function iniciarAberturaAutomatica(rota) {
-  if (contagemAtiva || contagemCancelada) return;
-  if (localStorage.getItem(chaveDoDia()) === "1") return;
+  if (contagemCancelada || jaResolvidoHoje() || observador) return;
 
+  // sem suporte a IntersectionObserver: não abre sozinho, só deixa o botão pronto
+  if (!("IntersectionObserver" in window)) return;
+
+  const alvo = document.querySelector(".location-box");
+  if (!alvo) return;
+
+  observador = new IntersectionObserver(function (entradas) {
+    const visivel = entradas[0].isIntersecting && entradas[0].intersectionRatio >= 0.6;
+
+    if (!visivel) {
+      if (contagemAtiva || timerEspera) pararContagem();
+      return;
+    }
+    if (contagemAtiva || timerEspera || contagemCancelada || jaResolvidoHoje()) return;
+
+    // exige 2s parado no bloco antes de começar a contar
+    timerEspera = setTimeout(function () {
+      timerEspera = null;
+      contar(rota);
+    }, 2000);
+  }, { threshold: [0, 0.6, 1] });
+
+  observador.observe(alvo);
+}
+
+function contar(rota) {
   contagemAtiva = true;
   let restam = SEGUNDOS_ABERTURA_AUTOMATICA;
   autoOpen.hidden = false;
   autoOpenText.textContent = "Abrindo a rota em " + restam + "s...";
 
-  const timer = setInterval(function () {
+  timerContagem = setInterval(function () {
     restam--;
-    if (contagemCancelada) { clearInterval(timer); return; }
+    if (contagemCancelada) { pararContagem(); return; }
     if (restam <= 0) {
-      clearInterval(timer);
-      localStorage.setItem(chaveDoDia(), "1");
+      clearInterval(timerContagem);
+      timerContagem = null;
+      localStorage.setItem(chaveDoDia(), "aberto");
       autoOpenText.textContent = "Abrindo a rota...";
       window.location.href = rota;
       return;
@@ -153,7 +204,9 @@ function iniciarAberturaAutomatica(rota) {
 
 autoOpenCancel.addEventListener("click", function () {
   contagemCancelada = true;
-  autoOpen.hidden = true;
+  localStorage.setItem(chaveDoDia(), "cancelado");
+  pararContagem();
+  if (observador) { observador.disconnect(); observador = null; }
 });
 
 async function carregarLocalizacao() {
