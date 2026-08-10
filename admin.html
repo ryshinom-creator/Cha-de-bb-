@@ -39,6 +39,16 @@ details{margin-top:14px}summary{cursor:pointer;color:#8fa9bd;font-size:13px}
 <body>
 <div class="admin">
 
+  <div class="admin-card" id="avisoVersao" hidden style="border-color:#ff9eaa66;background:#2a1520">
+    <h2 style="color:#ff9eaa">⚠️ O código da planilha está desatualizado</h2>
+    <p class="hint">Este painel precisa da versão 3 do backend. Na sua planilha, abra
+    <b>Extensões → Apps Script</b>, apague o código antigo, cole o arquivo
+    <b>google-apps-script.gs</b> novo, salve e faça
+    <b>Implantar → Gerenciar implantações → lápis → Versão: Nova → Implantar</b>.
+    Enquanto isso não for feito, salvar e publicar não vão funcionar.</p>
+    <p class="hint" id="versaoDetectada"></p>
+  </div>
+
   <div class="admin-card">
     <div class="mini-label">🚀 CENTRAL DE COMANDO</div>
     <h1>Localização do evento</h1>
@@ -102,8 +112,9 @@ details{margin-top:14px}summary{cursor:pointer;color:#8fa9bd;font-size:13px}
 
   <div class="admin-card">
     <h2>Confirmações</h2>
+    <p class="hint">Atualiza sozinho a cada 30 segundos, e também toda vez que você volta para esta aba.</p>
     <div class="row">
-      <button class="ghost" onclick="carregarLista()">ATUALIZAR</button>
+      <button class="ghost" onclick="carregarLista()">ATUALIZAR AGORA</button>
       <button class="ghost" onclick="baixarCsv()">BAIXAR CSV</button>
     </div>
     <div id="stats"></div>
@@ -180,13 +191,14 @@ async function escreverEndereco(precisao){
   const m = el("gpsMsg");
   try{
     const d = await chamar({action:"traduzir", lat: el("lat").value, lng: el("lng").value});
-    if(d.ok){
+    if(d.ok && d.endereco){
       el("endereco").value = d.endereco;
       m.className="msg";
       m.innerHTML = "Endereço encontrado. <span class='accuracy'>PRECISÃO ~" + precisao + " M</span><br>Confira se está certo e corrija se precisar — a rota usa as coordenadas, não o texto.";
     }else{
       m.className="msg err";
-      m.textContent = d.error + " Escreva o endereço à mão; as coordenadas do GPS já estão salvas.";
+      m.textContent = (d.error || "O código da planilha está desatualizado — atualize o Apps Script.") +
+        " As coordenadas do GPS já estão nos campos avançados; você pode escrever o endereço à mão.";
     }
   }catch(e){
     m.className="msg err";
@@ -202,7 +214,7 @@ async function buscarEndereco(){
   m.className="msg wait"; m.textContent="Procurando no mapa…";
   try{
     const d = await chamar({action:"traduzir", endereco: texto});
-    if(d.ok){
+    if(d.ok && d.endereco){
       el("endereco").value = d.endereco;
       el("lat").value = d.lat;
       el("lng").value = d.lng;
@@ -210,7 +222,7 @@ async function buscarEndereco(){
       m.textContent = d.exatidao === "ROOFTOP"
         ? "Encontrado no número exato. A rota vai levar direto à porta."
         : "Encontrado, mas de forma aproximada. Se puder, use o GPS no local para ficar exato.";
-    }else{ m.className="msg err"; m.textContent = d.error; }
+    }else{ m.className="msg err"; m.textContent = d.error || "O código da planilha está desatualizado — atualize o Apps Script."; }
   }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
 }
 
@@ -244,13 +256,17 @@ async function salvar(publicar){
       publicar: publicar ? "SIM" : "NAO",
       abrirAutomatico: el("abrirAutomatico").checked ? "SIM" : "NAO"
     });
-    if(d.ok){
+    if(d.ok && d.config){
       m.className="msg";
       m.textContent = publicar
         ? "Publicado. Os convidados já conseguem abrir a rota."
         : "Salvo. Ninguém está vendo ainda — clique em publicar quando quiser liberar.";
       aplicar(d);
-    }else{ m.className="msg err"; m.textContent = d.error; }
+    }else{
+      m.className="msg err";
+      m.textContent = d.error || "O código da planilha está desatualizado — atualize o Apps Script e crie uma nova versão da implantação.";
+      checarVersao();
+    }
   }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
 }
 
@@ -320,7 +336,14 @@ async function carregarLista(){
   const m = el("listMsg"); m.className="msg wait"; m.textContent="Carregando…";
   try{
     const d = await chamar({action:"list"});
-    if(!d.ok){ m.className="msg err"; m.textContent=d.error; return; }
+    if(!d.ok){
+      m.className="msg err";
+      m.textContent = /senha/i.test(d.error || "")
+        ? "O código da planilha ainda é o antigo (ele pede senha para listar). Atualize o Apps Script e crie uma nova versão da implantação."
+        : d.error;
+      checarVersao();
+      return;
+    }
     ultimaLista = d.items || [];
     const sim = ultimaLista.filter(x=>x.attending==="sim");
     el("stats").innerHTML =
@@ -331,7 +354,11 @@ async function carregarLista(){
       '<tr><td>'+esc(x.name)+'</td><td class="'+(x.attending==="sim"?"yes":"no")+'">'+
       (x.attending==="sim"?"SIM 🚀":"NÃO 🌙")+'</td><td>'+(x.guests||0)+'</td><td>'+
       esc(x.message||"")+'</td><td>'+esc(x.date||"")+'</td></tr>').join("");
-    m.className="msg"; m.textContent = ultimaLista.length ? "" : "Ninguém respondeu ainda.";
+    const hora = new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    m.className="msg";
+    m.textContent = ultimaLista.length
+      ? "Última verificação às " + hora + " — " + ultimaLista.length + " resposta(s)."
+      : "Ninguém respondeu ainda. (Verificado às " + hora + ".)";
   }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
 }
 
@@ -348,7 +375,23 @@ function baixarCsv(){
 
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 
+async function checarVersao(){
+  try{
+    const d = await chamar({action:"ping"});
+    const antigo = !d || d.versao !== 3;
+    el("avisoVersao").hidden = !antigo;
+    if(antigo) el("versaoDetectada").textContent =
+      "Versão detectada na planilha: " + ((d && d.versao) ? d.versao : "desconhecida") + ".";
+  }catch(e){ /* o status já avisa sobre conexão */ }
+}
+
+checarVersao();
 carregarStatus();
 carregarLista();
+
+setInterval(function(){ carregarLista(); carregarStatus(); }, 30000);
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden){ carregarLista(); carregarStatus(); }
+});
 </script>
 </body></html>
