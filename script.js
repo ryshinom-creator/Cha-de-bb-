@@ -15,9 +15,7 @@ const locationText = document.getElementById("locationText");
 const locationAddress = document.getElementById("locationAddress");
 const locationActions = document.getElementById("locationActions");
 const locationLocked = document.getElementById("locationLocked");
-const routeButton = document.getElementById("routeButton");
 const mapButton = document.getElementById("mapButton");
-const wazeButton = document.getElementById("wazeButton");
 const infoLocal = document.getElementById("infoLocal");
 const autoOpen = document.getElementById("autoOpen");
 const autoOpenText = document.getElementById("autoOpenText");
@@ -104,7 +102,7 @@ function chaveDoDia() {
 }
 
 function mostrarLiberada(d) {
-  locationText.textContent = d.mensagem || "Localização liberada! Toque no botão para abrir a rota.";
+  locationText.textContent = d.mensagem || "Localização liberada! Toque no botão para ver no mapa.";
 
   if (d.endereco) {
     locationAddress.textContent = d.endereco;
@@ -112,14 +110,13 @@ function mostrarLiberada(d) {
     infoLocal.textContent = d.endereco;
   }
 
-  routeButton.href = d.rota || "#";
-  if (d.mapa) { mapButton.href = d.mapa; mapButton.hidden = false; } else { mapButton.hidden = true; }
-  if (d.waze) { wazeButton.href = d.waze; wazeButton.hidden = false; } else { wazeButton.hidden = true; }
+  const destino = d.mapa || d.rota || "";
+  mapButton.href = destino || "#";
 
-  locationActions.hidden = false;
-  locationLocked.hidden = true;
+  locationActions.hidden = !destino;
+  locationLocked.hidden = !!destino;
 
-  if (d.abrirAutomatico && d.rota) iniciarAberturaAutomatica(d.rota);
+  if (d.abrirAutomatico && destino) iniciarAberturaAutomatica(destino);
 }
 
 function mostrarBloqueada() {
@@ -131,7 +128,7 @@ function mostrarBloqueada() {
 }
 
 /**
- * Abertura automática da rota.
+ * Abertura automática do mapa.
  * Só entra em contagem quando o convidado está de fato parado olhando o bloco de
  * localização — se ele estiver rolando a página, nada acontece. Rolar para longe
  * cancela a contagem, e cancelar à mão vale para o resto do dia.
@@ -185,7 +182,7 @@ function contar(rota) {
   contagemAtiva = true;
   let restam = SEGUNDOS_ABERTURA_AUTOMATICA;
   autoOpen.hidden = false;
-  autoOpenText.textContent = "Abrindo a rota em " + restam + "s...";
+  autoOpenText.textContent = "Abrindo o mapa em " + restam + "s...";
 
   timerContagem = setInterval(function () {
     restam--;
@@ -194,11 +191,11 @@ function contar(rota) {
       clearInterval(timerContagem);
       timerContagem = null;
       localStorage.setItem(chaveDoDia(), "aberto");
-      autoOpenText.textContent = "Abrindo a rota...";
+      autoOpenText.textContent = "Abrindo o mapa...";
       window.location.href = rota;
       return;
     }
-    autoOpenText.textContent = "Abrindo a rota em " + restam + "s...";
+    autoOpenText.textContent = "Abrindo o mapa em " + restam + "s...";
   }, 1000);
 }
 
