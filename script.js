@@ -2,7 +2,7 @@
    MISSÃO AYDAN — site público
    COLE ABAIXO a URL /exec do seu Google Apps Script (a mesma do admin).
 ------------------------------------------------------------------ */
-const API_URL = "";
+const API_URL = "https://script.google.com/macros/s/AKfycbxLoO96uzau5hLFmKQmmaCrulP3N5sWPHTAdOWWxvtP7T9XXKA5sQEO8Bw2r1GASLwh/exec";
 
 const INTERVALO_CHECAGEM = 20000; // checa a localização a cada 20s
 const SEGUNDOS_ABERTURA_AUTOMATICA = 6;
