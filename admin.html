@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Painel — Missão Aydan</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+body{padding:20px}
+.admin{max-width:760px;margin:auto}
+.admin-card{background:#091a33;border:1px solid #4bb6dc33;border-radius:25px;padding:22px;margin-bottom:16px;box-shadow:0 15px 45px #0008}
+.admin h1{font-size:30px;margin:10px 0 4px}
+.admin h2{font-family:"Playfair Display",serif;font-size:23px;margin:0 0 4px}
+.hint{color:#8fa9bd;font-size:12px;margin:6px 0 0;line-height:1.5}
+.field{margin-top:15px}
+.field label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
+.msg{min-height:20px;font-size:13px;color:#71e2b0;margin:8px 0 0;line-height:1.5}
+.msg.err{color:#ff9eaa}.msg.wait{color:#8fa9bd}
+button.ghost{background:#06172c;border:1px solid #4bb6dc55;box-shadow:none;color:#dff7ff}
+button.gps{background:linear-gradient(135deg,#2f8f6f,#1d6f57);box-shadow:none}
+button.danger{background:#6d2c39;box-shadow:none}
+.switch{display:flex;align-items:center;gap:10px;margin-top:15px;font-size:13px;line-height:1.4}
+.switch input{width:auto;flex:0 0 auto;transform:scale(1.3)}
+.status{margin-top:4px;background:#06172c;border:1px solid #4bb6dc22;border-radius:16px;padding:16px;font-size:13px;line-height:1.6}
+.status a{color:#8de4ff;word-break:break-all}
+.tag{display:inline-block;font-family:Orbitron;font-size:9px;letter-spacing:.1em;padding:5px 11px;border-radius:99px;margin-bottom:9px}
+.tag.on{background:#0d3b2c;color:#71e2b0}.tag.off{background:#3a2531;color:#ff9eaa}
+.accuracy{display:inline-block;margin-top:8px;font-size:11px;font-family:Orbitron;letter-spacing:.08em;padding:5px 10px;border-radius:99px;background:#06172c;color:#8de4ff}
+.stat{display:inline-block;padding:12px 16px;border-radius:14px;background:#06172c;margin:5px 5px 0 0;font-size:12px}
+.stat b{font-size:22px;color:#70d0f5;display:block}
+.table-wrap{overflow:auto;margin-top:10px}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{padding:10px;border-bottom:1px solid #ffffff12;text-align:left;font-size:13px}
+th{color:#70d0f5;font-family:Orbitron;font-size:10px}
+.yes{color:#71e2b0}.no{color:#ff9eaa}
+details{margin-top:14px}summary{cursor:pointer;color:#8fa9bd;font-size:13px}
+</style></head>
+<body>
+<div class="admin">
+
+  <div class="admin-card" id="avisoVersao" hidden style="border-color:#ff9eaa66;background:#2a1520">
+    <h2 style="color:#ff9eaa">⚠️ O código da planilha está desatualizado</h2>
+    <p class="hint">Este painel precisa da versão 3 do backend. Na sua planilha, abra
+    <b>Extensões → Apps Script</b>, apague o código antigo, cole o arquivo
+    <b>google-apps-script.gs</b> novo, salve e faça
+    <b>Implantar → Gerenciar implantações → lápis → Versão: Nova → Implantar</b>.
+    Enquanto isso não for feito, salvar e publicar não vão funcionar.</p>
+    <p class="hint" id="versaoDetectada"></p>
+  </div>
+
+  <div class="admin-card">
+    <div class="mini-label">🚀 CENTRAL DE COMANDO</div>
+    <h1>Localização do evento</h1>
+    <p class="hint">Marque o local, confira o endereço e publique quando quiser. Os convidados só veem depois de você publicar.</p>
+    <div class="status" id="status"><span class="tag off">CARREGANDO…</span><div>Consultando a planilha…</div></div>
+  </div>
+
+  <div class="admin-card">
+    <h2>1. Marcar o local</h2>
+    <p class="hint">Estando no local, o GPS é o jeito mais exato. O endereço é escrito sozinho a partir das coordenadas.</p>
+
+    <button class="gps" onclick="pegarGps()">📡 USAR MINHA LOCALIZAÇÃO ATUAL</button>
+    <p id="gpsMsg" class="msg"></p>
+
+    <div class="field">
+      <label for="endereco">Endereço</label>
+      <input id="endereco" placeholder="Rua, número, bairro, cidade">
+      <div class="row" style="margin-top:10px">
+        <button class="ghost" onclick="buscarEndereco()">🔎 CONFERIR ESTE ENDEREÇO NO MAPA</button>
+      </div>
+      <p id="endMsg" class="msg"></p>
+    </div>
+
+    <div class="field">
+      <label for="mensagem">Recado que aparece junto do endereço</label>
+      <input id="mensagem" placeholder="Estamos te esperando! Toque para abrir a rota.">
+    </div>
+
+    <div class="switch">
+      <input type="checkbox" id="abrirAutomatico" checked>
+      <label for="abrirAutomatico" style="margin:0">Abrir a rota automaticamente no celular do convidado</label>
+    </div>
+
+    <details>
+      <summary>Ajustes avançados (coordenadas e link do Maps)</summary>
+      <div class="row">
+        <div class="field"><label for="lat">Latitude</label><input id="lat" placeholder="-23.550520"></div>
+        <div class="field"><label for="lng">Longitude</label><input id="lng" placeholder="-46.633308"></div>
+      </div>
+      <div class="field">
+        <label for="link">Link do Google Maps (opcional)</label>
+        <input id="link" placeholder="https://maps.app.goo.gl/...">
+        <p class="hint">Se o link tiver coordenadas, elas entram automaticamente nos campos acima.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="admin-card">
+    <h2>2. Publicar</h2>
+    <p class="hint">Salvar guarda o endereço sem mostrar a ninguém. Publicar libera na hora — os sites dos convidados atualizam sozinhos em até 20 segundos.</p>
+    <div class="row">
+      <button class="ghost" onclick="salvar(false)">💾 SALVAR SEM PUBLICAR</button>
+      <button onclick="salvar(true)">📍 PUBLICAR AGORA</button>
+    </div>
+    <div class="row" style="margin-top:0">
+      <button class="ghost" onclick="ocultar()">🙈 OCULTAR DOS CONVIDADOS</button>
+      <button class="danger" onclick="excluir()">🗑️ EXCLUIR ENDEREÇO</button>
+    </div>
+    <p id="acaoMsg" class="msg"></p>
+  </div>
+
+  <div class="admin-card">
+    <h2>Confirmações</h2>
+    <p class="hint">Atualiza sozinho a cada 30 segundos, e também toda vez que você volta para esta aba.</p>
+    <div class="row">
+      <button class="ghost" onclick="carregarLista()">ATUALIZAR AGORA</button>
+      <button class="ghost" onclick="baixarCsv()">BAIXAR CSV</button>
+    </div>
+    <div id="stats"></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>NOME</th><th>VAI?</th><th>PESSOAS</th><th>MENSAGEM</th><th>QUANDO</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <p id="listMsg" class="msg"></p>
+  </div>
+</div>
+
+<script>
+/* URL /exec do Google Apps Script */
+const API_URL = "https://script.google.com/macros/s/AKfycbxLoO96uzau5hLFmKQmmaCrulP3N5sWPHTAdOWWxvtP7T9XXKA5sQEO8Bw2r1GASLwh/exec";
+
+const el = id => document.getElementById(id);
+let ultimaLista = [];
+
+/* --------------------------- rede ---------------------------- */
+async function chamar(payload){
+  try{
+    const r = await fetch(API_URL, {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(payload)
+    });
+    return await r.json();
+  }catch(e){
+    const qs = new URLSearchParams();
+    Object.keys(payload).forEach(k => qs.append(k, payload[k] == null ? "" : payload[k]));
+    const r = await fetch(API_URL + "?" + qs.toString());
+    return await r.json();
+  }
+}
+
+/* ---------------------------- GPS ---------------------------- */
+/* Fica ouvindo o sensor por alguns segundos e guarda a leitura mais precisa. */
+function pegarGps(){
+  const m = el("gpsMsg");
+  if(!navigator.geolocation){
+    m.className="msg err"; m.textContent="Este navegador não dá acesso ao GPS. Digite o endereço abaixo.";
+    return;
+  }
+  m.className="msg wait"; m.textContent="Procurando satélites… fique parado por alguns segundos.";
+
+  let melhor = null;
+  const id = navigator.geolocation.watchPosition(p => {
+    if(!melhor || p.coords.accuracy < melhor.coords.accuracy) melhor = p;
+    m.textContent = "Precisão atual: cerca de " + Math.round(melhor.coords.accuracy) + " m. Refinando…";
+    if(melhor.coords.accuracy <= 10) finalizar();
+  }, err => {
+    navigator.geolocation.clearWatch(id);
+    m.className="msg err";
+    m.textContent = err.code === 1
+      ? "Permissão de localização negada. Libere para este site nas configurações do navegador."
+      : "Não consegui o sinal de GPS. Digite o endereço abaixo.";
+  }, {enableHighAccuracy:true, timeout:20000, maximumAge:0});
+
+  const prazo = setTimeout(finalizar, 12000);
+
+  function finalizar(){
+    clearTimeout(prazo);
+    navigator.geolocation.clearWatch(id);
+    if(!melhor){ m.className="msg err"; m.textContent="Não consegui o sinal de GPS. Digite o endereço abaixo."; return; }
+    el("lat").value = melhor.coords.latitude.toFixed(7);
+    el("lng").value = melhor.coords.longitude.toFixed(7);
+    const precisao = Math.round(melhor.coords.accuracy);
+    m.className="msg"; m.innerHTML = "Ponto marcado. <span class='accuracy'>PRECISÃO ~" + precisao + " M</span><br>Buscando o endereço deste ponto…";
+    escreverEndereco(precisao);
+  }
+}
+
+async function escreverEndereco(precisao){
+  const m = el("gpsMsg");
+  try{
+    const d = await chamar({action:"traduzir", lat: el("lat").value, lng: el("lng").value});
+    if(d.ok && d.endereco){
+      el("endereco").value = d.endereco;
+      m.className="msg";
+      m.innerHTML = "Endereço encontrado. <span class='accuracy'>PRECISÃO ~" + precisao + " M</span><br>Confira se está certo e corrija se precisar — a rota usa as coordenadas, não o texto.";
+    }else{
+      m.className="msg err";
+      m.textContent = (d.error || "O código da planilha está desatualizado — atualize o Apps Script.") +
+        " As coordenadas do GPS já estão nos campos avançados; você pode escrever o endereço à mão.";
+    }
+  }catch(e){
+    m.className="msg err";
+    m.textContent = "Não consegui falar com a planilha para buscar o endereço. Verifique a conexão.";
+  }
+}
+
+/* ------------------- endereço digitado ----------------------- */
+async function buscarEndereco(){
+  const m = el("endMsg");
+  const texto = el("endereco").value.trim();
+  if(texto.length < 4){ m.className="msg err"; m.textContent="Escreva rua, número e cidade."; return; }
+  m.className="msg wait"; m.textContent="Procurando no mapa…";
+  try{
+    const d = await chamar({action:"traduzir", endereco: texto});
+    if(d.ok && d.endereco){
+      el("endereco").value = d.endereco;
+      el("lat").value = d.lat;
+      el("lng").value = d.lng;
+      m.className="msg";
+      m.textContent = d.exatidao === "ROOFTOP"
+        ? "Encontrado no número exato. A rota vai levar direto à porta."
+        : "Encontrado, mas de forma aproximada. Se puder, use o GPS no local para ficar exato.";
+    }else{ m.className="msg err"; m.textContent = d.error || "O código da planilha está desatualizado — atualize o Apps Script."; }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
+}
+
+/* coordenadas escondidas dentro de um link do Maps */
+const PADROES = [
+  /@(-?\d+\.\d+),\s*(-?\d+\.\d+)/,
+  /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,
+  /[?&](?:q|ll|sll|center|destination)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/,
+  /^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/
+];
+el("link").addEventListener("input", () => {
+  const v = el("link").value;
+  for(const p of PADROES){
+    const m = v.match(p);
+    if(m){ el("lat").value = m[1]; el("lng").value = m[2]; return; }
+  }
+});
+
+/* ------------------------- ações ----------------------------- */
+async function salvar(publicar){
+  const m = el("acaoMsg"); m.className="msg wait";
+  m.textContent = publicar ? "Publicando…" : "Salvando…";
+  try{
+    const d = await chamar({
+      action:"save",
+      endereco: el("endereco").value.trim(),
+      lat: el("lat").value.trim(),
+      lng: el("lng").value.trim(),
+      link: el("link").value.trim(),
+      mensagem: el("mensagem").value.trim(),
+      publicar: publicar ? "SIM" : "NAO",
+      abrirAutomatico: el("abrirAutomatico").checked ? "SIM" : "NAO"
+    });
+    if(d.ok && d.config){
+      m.className="msg";
+      m.textContent = publicar
+        ? "Publicado. Os convidados já conseguem abrir a rota."
+        : "Salvo. Ninguém está vendo ainda — clique em publicar quando quiser liberar.";
+      aplicar(d);
+    }else{
+      m.className="msg err";
+      m.textContent = d.error || "O código da planilha está desatualizado — atualize o Apps Script e crie uma nova versão da implantação.";
+      checarVersao();
+    }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
+}
+
+async function ocultar(){
+  const m = el("acaoMsg"); m.className="msg wait"; m.textContent="Ocultando…";
+  try{
+    const d = await chamar({action:"hide"});
+    if(d.ok){ m.className="msg"; m.textContent="Oculto. O endereço continua salvo aqui."; aplicar(d); }
+    else{ m.className="msg err"; m.textContent=d.error; }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
+}
+
+async function excluir(){
+  if(!confirm("Excluir o endereço salvo? Isso apaga o local da planilha e os convidados voltam a ver o aviso de espera.")) return;
+  const m = el("acaoMsg"); m.className="msg wait"; m.textContent="Excluindo…";
+  try{
+    const d = await chamar({action:"delete"});
+    if(d.ok){
+      ["endereco","lat","lng","link","mensagem"].forEach(id => el(id).value = "");
+      el("gpsMsg").textContent = ""; el("endMsg").textContent = "";
+      m.className="msg"; m.textContent="Endereço excluído.";
+      aplicar(d);
+    }else{ m.className="msg err"; m.textContent=d.error; }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
+}
+
+/* ------------------------- status ---------------------------- */
+function aplicar(d){
+  const c = d.config || {};
+  if(!el("endereco").value) el("endereco").value = c.LOCAL_ENDERECO || "";
+  if(!el("lat").value) el("lat").value = c.LOCAL_LAT || "";
+  if(!el("lng").value) el("lng").value = c.LOCAL_LNG || "";
+  if(!el("link").value) el("link").value = c.LOCAL_LINK || "";
+  if(!el("mensagem").value) el("mensagem").value = c.LOCAL_MENSAGEM || "";
+  if(c.LOCAL_ABRIR_AUTOMATICO) el("abrirAutomatico").checked = c.LOCAL_ABRIR_AUTOMATICO.toUpperCase() !== "NAO";
+  mostrarStatus(d.publicada, c);
+}
+
+function mostrarStatus(p, c){
+  const box = el("status");
+  if(p && p.liberado){
+    box.innerHTML = '<span class="tag on">PUBLICADO — CONVIDADOS ESTÃO VENDO</span><div>' +
+      (p.endereco ? "<b>"+esc(p.endereco)+"</b><br>" : "") +
+      '<a href="'+esc(p.rota)+'" target="_blank" rel="noopener">testar a rota que eles recebem</a><br>' +
+      "Abertura automática: " + (p.abrirAutomatico ? "ligada" : "desligada") +
+      (p.atualizadoEm ? "<br>Atualizado em " + esc(p.atualizadoEm) : "") + "</div>";
+  }else{
+    const salvo = c && (c.LOCAL_ENDERECO || c.LOCAL_LAT || c.LOCAL_LINK);
+    box.innerHTML = '<span class="tag off">NÃO PUBLICADO</span><div>' +
+      (salvo ? "Há um endereço salvo aqui, mas ninguém está vendo:<br><b>"+esc(c.LOCAL_ENDERECO||"(sem texto)")+"</b>"
+             : "Nenhum endereço salvo. Marque o local acima.") + "</div>";
+  }
+}
+
+async function carregarStatus(){
+  try{
+    const d = await chamar({action:"status"});
+    if(d.ok) aplicar(d);
+    else el("status").innerHTML = '<span class="tag off">ERRO</span><div>'+esc(d.error)+'</div>';
+  }catch(e){
+    el("status").innerHTML = '<span class="tag off">SEM CONEXÃO</span><div>Não consegui falar com a planilha. Confira se a implantação do Apps Script está liberada para "qualquer pessoa".</div>';
+  }
+}
+
+/* -------------------------- lista ---------------------------- */
+async function carregarLista(){
+  const m = el("listMsg"); m.className="msg wait"; m.textContent="Carregando…";
+  try{
+    const d = await chamar({action:"list"});
+    if(!d.ok){
+      m.className="msg err";
+      m.textContent = /senha/i.test(d.error || "")
+        ? "O código da planilha ainda é o antigo (ele pede senha para listar). Atualize o Apps Script e crie uma nova versão da implantação."
+        : d.error;
+      checarVersao();
+      return;
+    }
+    ultimaLista = d.items || [];
+    const sim = ultimaLista.filter(x=>x.attending==="sim");
+    el("stats").innerHTML =
+      '<span class="stat">Confirmados<b>'+sim.length+'</b></span>'+
+      '<span class="stat">Não vão<b>'+(ultimaLista.length-sim.length)+'</b></span>'+
+      '<span class="stat">Total de pessoas<b>'+sim.reduce((s,x)=>s+(Number(x.guests)||1),0)+'</b></span>';
+    el("tbody").innerHTML = ultimaLista.map(x =>
+      '<tr><td>'+esc(x.name)+'</td><td class="'+(x.attending==="sim"?"yes":"no")+'">'+
+      (x.attending==="sim"?"SIM 🚀":"NÃO 🌙")+'</td><td>'+(x.guests||0)+'</td><td>'+
+      esc(x.message||"")+'</td><td>'+esc(x.date||"")+'</td></tr>').join("");
+    const hora = new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    m.className="msg";
+    m.textContent = ultimaLista.length
+      ? "Última verificação às " + hora + " — " + ultimaLista.length + " resposta(s)."
+      : "Ninguém respondeu ainda. (Verificado às " + hora + ".)";
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
+}
+
+function baixarCsv(){
+  if(!ultimaLista.length){ el("listMsg").className="msg err"; el("listMsg").textContent="Atualize a lista primeiro."; return; }
+  const linhas = [["Nome","Resposta","Pessoas","Mensagem","Data"]].concat(
+    ultimaLista.map(x=>[x.name, x.attending==="sim"?"SIM":"NAO", x.guests||0, x.message||"", x.date||""]));
+  const csv = "\uFEFF" + linhas.map(l=>l.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(";")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "convidados-aydan.csv";
+  a.click();
+}
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+async function checarVersao(){
+  try{
+    const d = await chamar({action:"ping"});
+    const antigo = !d || d.versao !== 3;
+    el("avisoVersao").hidden = !antigo;
+    if(antigo) el("versaoDetectada").textContent =
+      "Versão detectada na planilha: " + ((d && d.versao) ? d.versao : "desconhecida") + ".";
+  }catch(e){ /* o status já avisa sobre conexão */ }
+}
+
+checarVersao();
+carregarStatus();
+carregarLista();
+
+setInterval(function(){ carregarLista(); carregarStatus(); }, 30000);
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden){ carregarLista(); carregarStatus(); }
+});
+</script>
+</body></html>
