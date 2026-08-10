@@ -30,7 +30,7 @@
 <section class="info-section">
   <div class="info-card"><div class="info-icon">📅</div><small>DATA</small><strong>22 DE AGOSTO</strong></div>
   <div class="info-card"><div class="info-icon">🕐</div><small>HORÁRIO</small><strong>DAS 13 ÀS 19H</strong></div>
-  <div class="info-card"><div class="info-icon">📍</div><small>LOCAL</small><strong>Será liberado<br>no dia do evento</strong></div>
+  <div class="info-card"><div class="info-icon">📍</div><small>LOCAL</small><strong id="infoLocal">Será liberado<br>no dia do evento</strong></div>
 </section>
 
 <section class="panel" id="confirmar">
@@ -67,15 +67,30 @@
   </form>
 </section>
 
-<section class="location">
+<section class="location" id="localizacao">
   <div class="location-box">
     <div class="map-orbit">📡</div>
     <div>
       <div class="mini-label">CENTRAL DE NAVEGAÇÃO</div>
       <h2>Localização do evento</h2>
       <p id="locationText">O comandante liberará a localização no dia do evento.</p>
+      <p id="locationAddress" class="location-address" hidden></p>
     </div>
-    <a id="locationButton" class="location-btn disabled" href="#" target="_blank" rel="noopener">📍 VER LOCALIZAÇÃO</a>
+
+    <div id="autoOpen" class="auto-open" hidden>
+      <span id="autoOpenText"></span>
+      <button type="button" id="autoOpenCancel" class="link-btn">cancelar</button>
+    </div>
+
+    <div class="location-actions" id="locationActions" hidden>
+      <a id="routeButton" class="location-btn primary" href="#" target="_blank" rel="noopener">🧭 ABRIR ROTA ATÉ O EVENTO</a>
+      <div class="location-actions-row">
+        <a id="mapButton" class="location-btn small" href="#" target="_blank" rel="noopener">🗺️ VER NO MAPA</a>
+        <a id="wazeButton" class="location-btn small" href="#" target="_blank" rel="noopener">🚗 ABRIR NO WAZE</a>
+      </div>
+    </div>
+
+    <div id="locationLocked" class="location-btn disabled">📍 LOCALIZAÇÃO AINDA NÃO LIBERADA</div>
   </div>
 </section>
 
