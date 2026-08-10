@@ -122,18 +122,10 @@ function mostrarLiberada(d) {
   if (d.abrirAutomatico && d.rota) iniciarAberturaAutomatica(d.rota);
 }
 
-function mostrarBloqueada(d) {
+function mostrarBloqueada() {
   locationActions.hidden = true;
   locationLocked.hidden = false;
   autoOpen.hidden = true;
-  if (d && d.liberarEm) {
-    const q = new Date(d.liberarEm);
-    if (!isNaN(q.getTime())) {
-      locationText.textContent = "A localização será liberada em " +
-        q.toLocaleDateString("pt-BR") + " às " +
-        q.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ".";
-    }
-  }
 }
 
 function iniciarAberturaAutomatica(rota) {
@@ -170,7 +162,7 @@ async function carregarLocalizacao() {
     const r = await fetch(API_URL + "?action=location&t=" + Date.now());
     const d = await r.json();
     if (d && d.liberado) mostrarLiberada(d);
-    else mostrarBloqueada(d);
+    else mostrarBloqueada();
   } catch (e) { /* silencioso: tenta de novo no próximo ciclo */ }
 }
 

@@ -2,115 +2,113 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Painel ADM — Missão Aydan</title>
+<meta name="robots" content="noindex,nofollow">
+<title>Painel — Missão Aydan</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-body{padding:25px}
-.admin{max-width:1000px;margin:auto}
-.admin-card{background:#091a33;border:1px solid #4bb6dc33;border-radius:25px;padding:25px;margin-bottom:18px;box-shadow:0 15px 45px #0008}
-.admin h1{font-size:34px}
-.admin h2{font-family:"Playfair Display",serif;font-size:25px;margin:0 0 5px}
-.hint{color:#8fa9bd;font-size:12px;margin:6px 0 0}
-.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}
-.stat{display:inline-block;padding:15px 20px;border-radius:15px;background:#06172c;margin:5px}
-.stat b{font-size:25px;color:#70d0f5;display:block}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{padding:12px;border-bottom:1px solid #ffffff12;text-align:left;font-size:13px}
+body{padding:20px}
+.admin{max-width:760px;margin:auto}
+.admin-card{background:#091a33;border:1px solid #4bb6dc33;border-radius:25px;padding:22px;margin-bottom:16px;box-shadow:0 15px 45px #0008}
+.admin h1{font-size:30px;margin:10px 0 4px}
+.admin h2{font-family:"Playfair Display",serif;font-size:23px;margin:0 0 4px}
+.hint{color:#8fa9bd;font-size:12px;margin:6px 0 0;line-height:1.5}
+.field{margin-top:15px}
+.field label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
+.msg{min-height:20px;font-size:13px;color:#71e2b0;margin:8px 0 0;line-height:1.5}
+.msg.err{color:#ff9eaa}.msg.wait{color:#8fa9bd}
+button.ghost{background:#06172c;border:1px solid #4bb6dc55;box-shadow:none;color:#dff7ff}
+button.gps{background:linear-gradient(135deg,#2f8f6f,#1d6f57);box-shadow:none}
+button.danger{background:#6d2c39;box-shadow:none}
+.switch{display:flex;align-items:center;gap:10px;margin-top:15px;font-size:13px;line-height:1.4}
+.switch input{width:auto;flex:0 0 auto;transform:scale(1.3)}
+.status{margin-top:4px;background:#06172c;border:1px solid #4bb6dc22;border-radius:16px;padding:16px;font-size:13px;line-height:1.6}
+.status a{color:#8de4ff;word-break:break-all}
+.tag{display:inline-block;font-family:Orbitron;font-size:9px;letter-spacing:.1em;padding:5px 11px;border-radius:99px;margin-bottom:9px}
+.tag.on{background:#0d3b2c;color:#71e2b0}.tag.off{background:#3a2531;color:#ff9eaa}
+.accuracy{display:inline-block;margin-top:8px;font-size:11px;font-family:Orbitron;letter-spacing:.08em;padding:5px 10px;border-radius:99px;background:#06172c;color:#8de4ff}
+.stat{display:inline-block;padding:12px 16px;border-radius:14px;background:#06172c;margin:5px 5px 0 0;font-size:12px}
+.stat b{font-size:22px;color:#70d0f5;display:block}
+.table-wrap{overflow:auto;margin-top:10px}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{padding:10px;border-bottom:1px solid #ffffff12;text-align:left;font-size:13px}
 th{color:#70d0f5;font-family:Orbitron;font-size:10px}
 .yes{color:#71e2b0}.no{color:#ff9eaa}
-.msg{min-height:22px;color:#71e2b0;font-size:13px}
-.msg.err{color:#ff9eaa}
-button.ghost{background:#06172c;border:1px solid #4bb6dc55;box-shadow:none}
-button.danger{background:#7d3543;box-shadow:none}
-.field{margin-top:16px}
-.field label{display:block;font-weight:700;font-size:13px;margin-bottom:7px}
-.switch{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px}
-.switch input{width:auto;flex:0 0 auto;transform:scale(1.3)}
-.preview{margin-top:16px;background:#06172c;border:1px solid #4bb6dc22;border-radius:15px;padding:16px;font-size:13px;line-height:1.6}
-.preview a{color:#8de4ff;word-break:break-all}
-.tag{display:inline-block;font-family:Orbitron;font-size:9px;letter-spacing:.1em;padding:5px 10px;border-radius:99px;background:#0b2a43;color:#8de4ff;margin-bottom:8px}
-.tag.off{background:#3a2531;color:#ff9eaa}
+details{margin-top:14px}summary{cursor:pointer;color:#8fa9bd;font-size:13px}
 </style></head>
 <body>
 <div class="admin">
 
   <div class="admin-card">
     <div class="mini-label">🚀 CENTRAL DE COMANDO</div>
-    <h1>Painel ADM — Aydan</h1>
-    <p class="hint">Área do organizador. Aqui você publica o endereço e vê as confirmações.</p>
-    <div class="field">
-      <label for="password">Senha administrativa</label>
-      <input id="password" type="password" placeholder="Digite sua senha" autocomplete="current-password">
-    </div>
-    <div class="switch">
-      <input type="checkbox" id="remember"><label for="remember" style="margin:0">Lembrar a senha neste aparelho</label>
-    </div>
+    <h1>Localização do evento</h1>
+    <p class="hint">Marque o local, confira o endereço e publique quando quiser. Os convidados só veem depois de você publicar.</p>
+    <div class="status" id="status"><span class="tag off">CARREGANDO…</span><div>Consultando a planilha…</div></div>
   </div>
 
   <div class="admin-card">
-    <h2>📍 Localização do evento</h2>
-    <p class="hint">Preencha de uma das três formas: pegue o GPS do celular, cole um link do Google Maps ou escreva o endereço.</p>
+    <h2>1. Marcar o local</h2>
+    <p class="hint">Estando no local, o GPS é o jeito mais exato. O endereço é escrito sozinho a partir das coordenadas.</p>
+
+    <button class="gps" onclick="pegarGps()">📡 USAR MINHA LOCALIZAÇÃO ATUAL</button>
+    <p id="gpsMsg" class="msg"></p>
 
     <div class="field">
-      <button class="ghost" onclick="pegarGps()">📡 USAR MINHA LOCALIZAÇÃO ATUAL (GPS)</button>
-      <p id="gpsMsg" class="msg"></p>
+      <label for="endereco">Endereço</label>
+      <input id="endereco" placeholder="Rua, número, bairro, cidade">
+      <div class="row" style="margin-top:10px">
+        <button class="ghost" onclick="buscarEndereco()">🔎 CONFERIR ESTE ENDEREÇO NO MAPA</button>
+      </div>
+      <p id="endMsg" class="msg"></p>
     </div>
 
     <div class="field">
-      <label for="link">Link do Google Maps <span class="hint">(opcional)</span></label>
-      <input id="link" placeholder="https://maps.app.goo.gl/... ou https://www.google.com/maps/...">
-      <p class="hint">Se o link tiver coordenadas, elas são preenchidas automaticamente abaixo.</p>
-    </div>
-
-    <div class="row">
-      <div class="field"><label for="lat">Latitude</label><input id="lat" placeholder="-23.550520"></div>
-      <div class="field"><label for="lng">Longitude</label><input id="lng" placeholder="-46.633308"></div>
-    </div>
-
-    <div class="field">
-      <label for="endereco">Endereço que os convidados vão ler</label>
-      <input id="endereco" placeholder="Rua das Estrelas, 123 — Salão Órbita, São Paulo">
-    </div>
-
-    <div class="field">
-      <label for="mensagem">Recado junto da localização</label>
+      <label for="mensagem">Recado que aparece junto do endereço</label>
       <input id="mensagem" placeholder="Estamos te esperando! Toque para abrir a rota.">
-    </div>
-
-    <div class="field">
-      <label for="liberarEm">Liberar somente a partir de <span class="hint">(opcional)</span></label>
-      <input id="liberarEm" type="datetime-local">
-      <p class="hint">Deixe vazio para liberar na hora em que você publicar.</p>
     </div>
 
     <div class="switch">
       <input type="checkbox" id="abrirAutomatico" checked>
-      <label for="abrirAutomatico" style="margin:0">Abrir a rota automaticamente quando o convidado entrar no site</label>
+      <label for="abrirAutomatico" style="margin:0">Abrir a rota automaticamente no celular do convidado</label>
     </div>
 
-    <div class="row">
-      <button onclick="publicar()">PUBLICAR LOCALIZAÇÃO</button>
-      <button class="danger" onclick="ocultar()">OCULTAR DOS CONVIDADOS</button>
-    </div>
-    <p id="locationMsg" class="msg"></p>
-
-    <div class="preview" id="preview">
-      <span class="tag off">CARREGANDO…</span>
-      <div id="previewBody">Digite a senha e clique em atualizar para ver o que os convidados estão vendo.</div>
-    </div>
-    <button class="ghost" onclick="carregarStatus()">ATUALIZAR STATUS</button>
+    <details>
+      <summary>Ajustes avançados (coordenadas e link do Maps)</summary>
+      <div class="row">
+        <div class="field"><label for="lat">Latitude</label><input id="lat" placeholder="-23.550520"></div>
+        <div class="field"><label for="lng">Longitude</label><input id="lng" placeholder="-46.633308"></div>
+      </div>
+      <div class="field">
+        <label for="link">Link do Google Maps (opcional)</label>
+        <input id="link" placeholder="https://maps.app.goo.gl/...">
+        <p class="hint">Se o link tiver coordenadas, elas entram automaticamente nos campos acima.</p>
+      </div>
+    </details>
   </div>
 
   <div class="admin-card">
-    <h2>👨‍🚀 Lista de convidados</h2>
+    <h2>2. Publicar</h2>
+    <p class="hint">Salvar guarda o endereço sem mostrar a ninguém. Publicar libera na hora — os sites dos convidados atualizam sozinhos em até 20 segundos.</p>
     <div class="row">
-      <button onclick="carregarLista()">ATUALIZAR LISTA</button>
+      <button class="ghost" onclick="salvar(false)">💾 SALVAR SEM PUBLICAR</button>
+      <button onclick="salvar(true)">📍 PUBLICAR AGORA</button>
+    </div>
+    <div class="row" style="margin-top:0">
+      <button class="ghost" onclick="ocultar()">🙈 OCULTAR DOS CONVIDADOS</button>
+      <button class="danger" onclick="excluir()">🗑️ EXCLUIR ENDEREÇO</button>
+    </div>
+    <p id="acaoMsg" class="msg"></p>
+  </div>
+
+  <div class="admin-card">
+    <h2>Confirmações</h2>
+    <div class="row">
+      <button class="ghost" onclick="carregarLista()">ATUALIZAR</button>
       <button class="ghost" onclick="baixarCsv()">BAIXAR CSV</button>
     </div>
     <div id="stats"></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>NOME</th><th>RESPOSTA</th><th>PESSOAS</th><th>MENSAGEM</th><th>DATA</th></tr></thead>
+      <thead><tr><th>NOME</th><th>VAI?</th><th>PESSOAS</th><th>MENSAGEM</th><th>QUANDO</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table></div>
     <p id="listMsg" class="msg"></p>
@@ -118,17 +116,14 @@ button.danger{background:#7d3543;box-shadow:none}
 </div>
 
 <script>
-/* COLE ABAIXO a URL /exec do seu Google Apps Script (a mesma do script.js) */
+/* URL /exec do Google Apps Script */
 const API_URL = "https://script.google.com/macros/s/AKfycbxLoO96uzau5hLFmKQmmaCrulP3N5sWPHTAdOWWxvtP7T9XXKA5sQEO8Bw2r1GASLwh/exec";
 
+const el = id => document.getElementById(id);
 let ultimaLista = [];
 
-const el = id => document.getElementById(id);
-const senha = () => el("password").value;
-
-/* ------------------------- comunicação -------------------------- */
+/* --------------------------- rede ---------------------------- */
 async function chamar(payload){
-  if(!API_URL) throw new Error("Configure a URL do Apps Script no admin.html.");
   try{
     const r = await fetch(API_URL, {
       method:"POST",
@@ -137,7 +132,6 @@ async function chamar(payload){
     });
     return await r.json();
   }catch(e){
-    // fallback por GET (algumas redes bloqueiam o POST com redirecionamento)
     const qs = new URLSearchParams();
     Object.keys(payload).forEach(k => qs.append(k, payload[k] == null ? "" : payload[k]));
     const r = await fetch(API_URL + "?" + qs.toString());
@@ -145,24 +139,82 @@ async function chamar(payload){
   }
 }
 
-/* ---------------------------- GPS ------------------------------- */
+/* ---------------------------- GPS ---------------------------- */
+/* Fica ouvindo o sensor por alguns segundos e guarda a leitura mais precisa. */
 function pegarGps(){
   const m = el("gpsMsg");
-  if(!navigator.geolocation){ m.className="msg err"; m.textContent="Este aparelho não permite GPS pelo navegador."; return; }
-  m.className="msg"; m.textContent="Buscando sinal...";
-  navigator.geolocation.getCurrentPosition(p => {
-    el("lat").value = p.coords.latitude.toFixed(6);
-    el("lng").value = p.coords.longitude.toFixed(6);
-    m.textContent = "Coordenadas capturadas (precisão de cerca de " + Math.round(p.coords.accuracy) + " m).";
+  if(!navigator.geolocation){
+    m.className="msg err"; m.textContent="Este navegador não dá acesso ao GPS. Digite o endereço abaixo.";
+    return;
+  }
+  m.className="msg wait"; m.textContent="Procurando satélites… fique parado por alguns segundos.";
+
+  let melhor = null;
+  const id = navigator.geolocation.watchPosition(p => {
+    if(!melhor || p.coords.accuracy < melhor.coords.accuracy) melhor = p;
+    m.textContent = "Precisão atual: cerca de " + Math.round(melhor.coords.accuracy) + " m. Refinando…";
+    if(melhor.coords.accuracy <= 10) finalizar();
   }, err => {
+    navigator.geolocation.clearWatch(id);
     m.className="msg err";
     m.textContent = err.code === 1
-      ? "Permissão de localização negada. Libere no navegador e tente de novo."
-      : "Não foi possível pegar o GPS agora. Digite o endereço ou cole um link.";
-  }, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+      ? "Permissão de localização negada. Libere para este site nas configurações do navegador."
+      : "Não consegui o sinal de GPS. Digite o endereço abaixo.";
+  }, {enableHighAccuracy:true, timeout:20000, maximumAge:0});
+
+  const prazo = setTimeout(finalizar, 12000);
+
+  function finalizar(){
+    clearTimeout(prazo);
+    navigator.geolocation.clearWatch(id);
+    if(!melhor){ m.className="msg err"; m.textContent="Não consegui o sinal de GPS. Digite o endereço abaixo."; return; }
+    el("lat").value = melhor.coords.latitude.toFixed(7);
+    el("lng").value = melhor.coords.longitude.toFixed(7);
+    const precisao = Math.round(melhor.coords.accuracy);
+    m.className="msg"; m.innerHTML = "Ponto marcado. <span class='accuracy'>PRECISÃO ~" + precisao + " M</span><br>Buscando o endereço deste ponto…";
+    escreverEndereco(precisao);
+  }
 }
 
-/* --------------- coordenadas dentro de um link ------------------ */
+async function escreverEndereco(precisao){
+  const m = el("gpsMsg");
+  try{
+    const d = await chamar({action:"traduzir", lat: el("lat").value, lng: el("lng").value});
+    if(d.ok){
+      el("endereco").value = d.endereco;
+      m.className="msg";
+      m.innerHTML = "Endereço encontrado. <span class='accuracy'>PRECISÃO ~" + precisao + " M</span><br>Confira se está certo e corrija se precisar — a rota usa as coordenadas, não o texto.";
+    }else{
+      m.className="msg err";
+      m.textContent = d.error + " Escreva o endereço à mão; as coordenadas do GPS já estão salvas.";
+    }
+  }catch(e){
+    m.className="msg err";
+    m.textContent = "Não consegui falar com a planilha para buscar o endereço. Verifique a conexão.";
+  }
+}
+
+/* ------------------- endereço digitado ----------------------- */
+async function buscarEndereco(){
+  const m = el("endMsg");
+  const texto = el("endereco").value.trim();
+  if(texto.length < 4){ m.className="msg err"; m.textContent="Escreva rua, número e cidade."; return; }
+  m.className="msg wait"; m.textContent="Procurando no mapa…";
+  try{
+    const d = await chamar({action:"traduzir", endereco: texto});
+    if(d.ok){
+      el("endereco").value = d.endereco;
+      el("lat").value = d.lat;
+      el("lng").value = d.lng;
+      m.className="msg";
+      m.textContent = d.exatidao === "ROOFTOP"
+        ? "Encontrado no número exato. A rota vai levar direto à porta."
+        : "Encontrado, mas de forma aproximada. Se puder, use o GPS no local para ficar exato.";
+    }else{ m.className="msg err"; m.textContent = d.error; }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
+}
+
+/* coordenadas escondidas dentro de um link do Maps */
 const PADROES = [
   /@(-?\d+\.\d+),\s*(-?\d+\.\d+)/,
   /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,
@@ -177,117 +229,126 @@ el("link").addEventListener("input", () => {
   }
 });
 
-/* -------------------------- publicar ---------------------------- */
-async function publicar(){
-  const m = el("locationMsg"); m.className="msg";
-  if(!senha()){ m.className="msg err"; m.textContent="Digite a senha administrativa."; return; }
-  if(!el("link").value && !el("endereco").value && !(el("lat").value && el("lng").value)){
-    m.className="msg err"; m.textContent="Preencha o GPS, o link ou o endereço."; return;
-  }
-  m.textContent = "Publicando...";
+/* ------------------------- ações ----------------------------- */
+async function salvar(publicar){
+  const m = el("acaoMsg"); m.className="msg wait";
+  m.textContent = publicar ? "Publicando…" : "Salvando…";
   try{
     const d = await chamar({
-      action:"setLocation",
-      password: senha(),
-      link: el("link").value.trim(),
+      action:"save",
+      endereco: el("endereco").value.trim(),
       lat: el("lat").value.trim(),
       lng: el("lng").value.trim(),
-      endereco: el("endereco").value.trim(),
+      link: el("link").value.trim(),
       mensagem: el("mensagem").value.trim(),
-      liberarEm: el("liberarEm").value,
+      publicar: publicar ? "SIM" : "NAO",
       abrirAutomatico: el("abrirAutomatico").checked ? "SIM" : "NAO"
     });
-    if(d.ok){ m.textContent = "Localização publicada às " + (d.atualizadoEm || "agora") + "."; salvarSenha(); mostrarPreview(d.publicada); }
-    else { m.className="msg err"; m.textContent = d.error; }
-  }catch(e){ m.className="msg err"; m.textContent = e.message; }
+    if(d.ok){
+      m.className="msg";
+      m.textContent = publicar
+        ? "Publicado. Os convidados já conseguem abrir a rota."
+        : "Salvo. Ninguém está vendo ainda — clique em publicar quando quiser liberar.";
+      aplicar(d);
+    }else{ m.className="msg err"; m.textContent = d.error; }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
 }
 
 async function ocultar(){
-  const m = el("locationMsg"); m.className="msg"; m.textContent="Ocultando...";
+  const m = el("acaoMsg"); m.className="msg wait"; m.textContent="Ocultando…";
   try{
-    const d = await chamar({action:"hideLocation", password: senha()});
-    if(d.ok){ m.textContent="Localização ocultada. Os convidados voltaram a ver o aviso de espera."; carregarStatus(); }
-    else { m.className="msg err"; m.textContent=d.error; }
-  }catch(e){ m.className="msg err"; m.textContent=e.message; }
+    const d = await chamar({action:"hide"});
+    if(d.ok){ m.className="msg"; m.textContent="Oculto. O endereço continua salvo aqui."; aplicar(d); }
+    else{ m.className="msg err"; m.textContent=d.error; }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
 }
 
-/* --------------------------- status ----------------------------- */
-async function carregarStatus(){
-  if(!senha()) return;
+async function excluir(){
+  if(!confirm("Excluir o endereço salvo? Isso apaga o local da planilha e os convidados voltam a ver o aviso de espera.")) return;
+  const m = el("acaoMsg"); m.className="msg wait"; m.textContent="Excluindo…";
   try{
-    const d = await chamar({action:"status", password: senha()});
-    if(!d.ok){ el("previewBody").textContent = d.error; return; }
-    const c = d.config || {};
-    el("link").value = el("link").value || c.LOCAL_LINK || "";
-    el("lat").value = el("lat").value || c.LOCAL_LAT || "";
-    el("lng").value = el("lng").value || c.LOCAL_LNG || "";
-    el("endereco").value = el("endereco").value || c.LOCAL_ENDERECO || "";
-    el("mensagem").value = el("mensagem").value || c.LOCAL_MENSAGEM || "";
-    if(c.LOCAL_LIBERAR_EM && !el("liberarEm").value) el("liberarEm").value = c.LOCAL_LIBERAR_EM;
-    el("abrirAutomatico").checked = String(c.LOCAL_ABRIR_AUTOMATICO||"").toUpperCase() !== "NAO";
-    mostrarPreview(d.publicada);
-    salvarSenha();
-  }catch(e){ el("previewBody").textContent = e.message; }
+    const d = await chamar({action:"delete"});
+    if(d.ok){
+      ["endereco","lat","lng","link","mensagem"].forEach(id => el(id).value = "");
+      el("gpsMsg").textContent = ""; el("endMsg").textContent = "";
+      m.className="msg"; m.textContent="Endereço excluído.";
+      aplicar(d);
+    }else{ m.className="msg err"; m.textContent=d.error; }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
 }
 
-function mostrarPreview(p){
-  const box = el("preview");
-  if(!p || !p.liberado){
-    box.innerHTML = '<span class="tag off">CONVIDADOS NÃO ESTÃO VENDO</span><div>' +
-      (p && p.liberarEm ? "Agendada para " + esc(p.liberarEm).replace("T"," ") + "." : "Nenhuma localização liberada.") + '</div>';
-    return;
+/* ------------------------- status ---------------------------- */
+function aplicar(d){
+  const c = d.config || {};
+  if(!el("endereco").value) el("endereco").value = c.LOCAL_ENDERECO || "";
+  if(!el("lat").value) el("lat").value = c.LOCAL_LAT || "";
+  if(!el("lng").value) el("lng").value = c.LOCAL_LNG || "";
+  if(!el("link").value) el("link").value = c.LOCAL_LINK || "";
+  if(!el("mensagem").value) el("mensagem").value = c.LOCAL_MENSAGEM || "";
+  if(c.LOCAL_ABRIR_AUTOMATICO) el("abrirAutomatico").checked = c.LOCAL_ABRIR_AUTOMATICO.toUpperCase() !== "NAO";
+  mostrarStatus(d.publicada, c);
+}
+
+function mostrarStatus(p, c){
+  const box = el("status");
+  if(p && p.liberado){
+    box.innerHTML = '<span class="tag on">PUBLICADO — CONVIDADOS ESTÃO VENDO</span><div>' +
+      (p.endereco ? "<b>"+esc(p.endereco)+"</b><br>" : "") +
+      '<a href="'+esc(p.rota)+'" target="_blank" rel="noopener">testar a rota que eles recebem</a><br>' +
+      "Abertura automática: " + (p.abrirAutomatico ? "ligada" : "desligada") +
+      (p.atualizadoEm ? "<br>Atualizado em " + esc(p.atualizadoEm) : "") + "</div>";
+  }else{
+    const salvo = c && (c.LOCAL_ENDERECO || c.LOCAL_LAT || c.LOCAL_LINK);
+    box.innerHTML = '<span class="tag off">NÃO PUBLICADO</span><div>' +
+      (salvo ? "Há um endereço salvo aqui, mas ninguém está vendo:<br><b>"+esc(c.LOCAL_ENDERECO||"(sem texto)")+"</b>"
+             : "Nenhum endereço salvo. Marque o local acima.") + "</div>";
   }
-  box.innerHTML = '<span class="tag">CONVIDADOS ESTÃO VENDO</span><div>' +
-    (p.endereco ? "<b>" + esc(p.endereco) + "</b><br>" : "") +
-    (p.mensagem ? esc(p.mensagem) + "<br>" : "") +
-    'Rota: <a href="' + esc(p.rota) + '" target="_blank" rel="noopener">testar link da rota</a><br>' +
-    'Abertura automática: ' + (p.abrirAutomatico ? "ligada" : "desligada") +
-    (p.atualizadoEm ? "<br>Atualizado em " + esc(p.atualizadoEm) : "") + '</div>';
 }
 
-/* ---------------------------- lista ----------------------------- */
-async function carregarLista(){
-  const m = el("listMsg"); m.className="msg"; m.textContent="Carregando...";
+async function carregarStatus(){
   try{
-    const d = await chamar({action:"list", password: senha()});
+    const d = await chamar({action:"status"});
+    if(d.ok) aplicar(d);
+    else el("status").innerHTML = '<span class="tag off">ERRO</span><div>'+esc(d.error)+'</div>';
+  }catch(e){
+    el("status").innerHTML = '<span class="tag off">SEM CONEXÃO</span><div>Não consegui falar com a planilha. Confira se a implantação do Apps Script está liberada para "qualquer pessoa".</div>';
+  }
+}
+
+/* -------------------------- lista ---------------------------- */
+async function carregarLista(){
+  const m = el("listMsg"); m.className="msg wait"; m.textContent="Carregando…";
+  try{
+    const d = await chamar({action:"list"});
     if(!d.ok){ m.className="msg err"; m.textContent=d.error; return; }
     ultimaLista = d.items || [];
     const sim = ultimaLista.filter(x=>x.attending==="sim");
-    const nao = ultimaLista.filter(x=>x.attending!=="sim");
     el("stats").innerHTML =
       '<span class="stat">Confirmados<b>'+sim.length+'</b></span>'+
-      '<span class="stat">Não vão<b>'+nao.length+'</b></span>'+
+      '<span class="stat">Não vão<b>'+(ultimaLista.length-sim.length)+'</b></span>'+
       '<span class="stat">Total de pessoas<b>'+sim.reduce((s,x)=>s+(Number(x.guests)||1),0)+'</b></span>';
     el("tbody").innerHTML = ultimaLista.map(x =>
-      '<tr><td>'+esc(x.name)+'</td>'+
-      '<td class="'+(x.attending==="sim"?"yes":"no")+'">'+(x.attending==="sim"?"SIM 🚀":"NÃO 🌙")+'</td>'+
-      '<td>'+(x.guests||0)+'</td><td>'+esc(x.message||"")+'</td><td>'+esc(x.date||"")+'</td></tr>').join("");
-    m.textContent = ultimaLista.length ? "" : "Ninguém respondeu ainda.";
-    salvarSenha();
-  }catch(e){ m.className="msg err"; m.textContent=e.message; }
+      '<tr><td>'+esc(x.name)+'</td><td class="'+(x.attending==="sim"?"yes":"no")+'">'+
+      (x.attending==="sim"?"SIM 🚀":"NÃO 🌙")+'</td><td>'+(x.guests||0)+'</td><td>'+
+      esc(x.message||"")+'</td><td>'+esc(x.date||"")+'</td></tr>').join("");
+    m.className="msg"; m.textContent = ultimaLista.length ? "" : "Ninguém respondeu ainda.";
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
 }
 
 function baixarCsv(){
-  if(!ultimaLista.length){ el("listMsg").textContent="Atualize a lista primeiro."; return; }
+  if(!ultimaLista.length){ el("listMsg").className="msg err"; el("listMsg").textContent="Atualize a lista primeiro."; return; }
   const linhas = [["Nome","Resposta","Pessoas","Mensagem","Data"]].concat(
     ultimaLista.map(x=>[x.name, x.attending==="sim"?"SIM":"NAO", x.guests||0, x.message||"", x.date||""]));
-  const csv = "\uFEFF" + linhas.map(l => l.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(";")).join("\n");
+  const csv = "\uFEFF" + linhas.map(l=>l.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(";")).join("\n");
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
   a.download = "convidados-aydan.csv";
   a.click();
 }
 
-/* ---------------------------- senha ----------------------------- */
-function salvarSenha(){
-  if(el("remember").checked) localStorage.setItem("aydan_adm", senha());
-  else localStorage.removeItem("aydan_adm");
-}
-const guardada = localStorage.getItem("aydan_adm");
-if(guardada){ el("password").value = guardada; el("remember").checked = true; }
-el("password").addEventListener("change", () => { if(senha()) carregarStatus(); });
-if(guardada && API_URL) carregarStatus();
-
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+carregarStatus();
+carregarLista();
 </script>
 </body></html>
