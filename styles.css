@@ -36,7 +36,9 @@ button{width:100%;margin-top:20px;border:0;border-radius:14px;padding:16px;backg
 .auto-open{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#06172c;border:1px solid #4bb6dc33;border-radius:13px;padding:12px 15px;font-size:13px;color:#8de4ff;font-weight:600}
 .link-btn{background:none;border:0;margin:0;padding:0;width:auto;color:#9db5ca;font:inherit;text-decoration:underline;cursor:pointer;box-shadow:none}
 @media(max-width:650px){.location-actions-row{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* respeita quem pede menos movimento, mas sem matar o tema espacial:
+   só o que fica balançando de verdade é parado */
+@media(prefers-reduced-motion:reduce){.diaper-emoji{animation:none}}
 
 /* o atributo hidden precisa vencer o display dos blocos acima */
 [hidden]{display:none!important}
@@ -65,3 +67,12 @@ button{width:100%;margin-top:20px;border:0;border-radius:14px;padding:16px;backg
   .diaper-size{font-size:60px}
   .mission-card{padding:22px}
 }
+
+/* --- opção fralda ou mimo --- */
+.or-divider{display:flex;align-items:center;gap:14px;margin:24px auto 20px;max-width:330px;color:#6f8ba1}
+.or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#4bb6dc44,transparent)}
+.or-divider span{font-family:Orbitron;font-size:10px;letter-spacing:.22em}
+.gift-option{display:flex;align-items:center;gap:15px;text-align:left;background:#06172c99;border:1px solid #4bb6dc26;border-radius:18px;padding:16px 18px;max-width:460px;margin:0 auto}
+.gift-emoji{font-size:30px;line-height:1;flex:0 0 auto}
+.gift-option p{font-size:13.5px!important;color:#b9cfe0!important}
+@media(max-width:650px){.gift-option{padding:14px}.gift-option p{font-size:13px!important}}
