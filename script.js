@@ -224,44 +224,42 @@ document.addEventListener("visibilitychange", function () {
 
 /* ------------------------- fraldas ---------------------------- */
 /**
- * Sorteia o tamanho da fralda a cada abertura do site.
- * Em vez de sortear solto (o que faria muita gente cair no mesmo tamanho),
- * cada aparelho recebe uma ordem embaralhada dos três tamanhos e vai
- * percorrendo essa ordem a cada visita. Assim os tamanhos ficam equilibrados
- * entre os convidados, e quem abre de novo recebe um tamanho diferente.
+ * Cada aparelho recebe UM tamanho e fica com ele para sempre.
+ * O tamanho é sorteado na primeira visita e guardado no navegador
+ * (localStorage), então recarregar a página ou voltar outro dia
+ * mostra sempre o mesmo. Isso não identifica a pessoa: é só uma
+ * marquinha no aparelho, sem nome nem cadastro.
  */
 const TAMANHOS = ["M", "G", "GG"];
+const CHAVE_FRALDA = "aydan_fralda_tamanho";
 
-function sortearFralda() {
+function definirFralda() {
   const alvo = document.getElementById("diaperSize");
+  const nota = document.getElementById("diaperNote");
   if (!alvo) return;
 
-  let ordem, passo;
+  let tamanho = null;
+  let primeiraVez = false;
+
   try {
-    ordem = JSON.parse(localStorage.getItem("aydan_fralda_ordem") || "null");
-    if (!Array.isArray(ordem) || ordem.length !== TAMANHOS.length) {
-      ordem = TAMANHOS.slice();
-      for (let i = ordem.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const t = ordem[i]; ordem[i] = ordem[j]; ordem[j] = t;
-      }
-      localStorage.setItem("aydan_fralda_ordem", JSON.stringify(ordem));
+    tamanho = localStorage.getItem(CHAVE_FRALDA);
+    if (TAMANHOS.indexOf(tamanho) === -1) tamanho = null;
+    if (!tamanho) {
+      tamanho = TAMANHOS[Math.floor(Math.random() * TAMANHOS.length)];
+      localStorage.setItem(CHAVE_FRALDA, tamanho);
+      primeiraVez = true;
     }
-    passo = parseInt(localStorage.getItem("aydan_fralda_passo") || "0", 10) || 0;
-    localStorage.setItem("aydan_fralda_passo", String(passo + 1));
   } catch (e) {
-    // navegador sem armazenamento: sorteia na hora
-    ordem = TAMANHOS;
-    passo = Math.floor(Math.random() * TAMANHOS.length);
+    // navegador sem armazenamento (ou aba anônima): sorteia só para exibir
+    tamanho = TAMANHOS[Math.floor(Math.random() * TAMANHOS.length)];
+    primeiraVez = true;
   }
 
-  const tamanho = ordem[passo % ordem.length];
   alvo.textContent = tamanho;
 
-  const nota = document.getElementById("diaperNote");
-  if (nota && passo > 0) {
-    nota.textContent = "Este é um tamanho novo para você — se já trouxe outro antes, qualquer um dos três ajuda muito!";
+  if (nota && !primeiraVez) {
+    nota.textContent = "Este é o seu tamanho e ele não muda mais — pode conferir quantas vezes quiser.";
   }
 }
 
-sortearFralda();
+definirFralda();
