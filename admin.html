@@ -90,10 +90,13 @@ details{margin-top:14px}summary{cursor:pointer;color:#8fa9bd;font-size:13px}
         <div class="field"><label for="lng">Longitude</label><input id="lng" placeholder="-46.633308"></div>
       </div>
       <div class="field">
-        <label for="link">Link do Google Maps (opcional)</label>
-        <input id="link" placeholder="https://maps.app.goo.gl/...">
-        <p class="hint">Se o link tiver coordenadas, elas entram automaticamente nos campos acima.</p>
+        <label for="link">Link do Maps ou coordenadas coladas</label>
+        <input id="link" placeholder='https://maps.app.goo.gl/...  ou  23°39&apos;40.9"S 46°23&apos;48.3"W'>
+        <p class="hint">Aceita link do Google Maps, coordenadas decimais (-23.661361, -46.396750) e o formato
+        com graus, minutos e segundos — a conversão é feita aqui e os campos acima são preenchidos.</p>
       </div>
+      <button class="ghost" onclick="enderecoDasCoordenadas()">🔎 BUSCAR O ENDEREÇO DESTAS COORDENADAS</button>
+      <p id="coordMsg" class="msg"></p>
     </details>
   </div>
 
@@ -227,6 +230,23 @@ async function buscarEndereco(){
   }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
 }
 
+/* graus, minutos e segundos: 23°39'40.9"S 46°23'48.3"W */
+const DMS = /(\d{1,3})\s*°\s*(\d{1,2})\s*['\u2019]\s*([\d.]+)\s*["\u201d]?\s*([NSEWnsewLOlo])/g;
+
+function lerDms(texto){
+  const achados = [...String(texto).matchAll(DMS)];
+  if(achados.length < 2) return null;
+  const valores = achados.slice(0,2).map(m => {
+    const dec = parseInt(m[1],10) + parseInt(m[2],10)/60 + parseFloat(m[3])/3600;
+    const dir = m[4].toUpperCase();
+    return { valor: (dir === "S" || dir === "W" || dir === "O") ? -dec : dec, dir: dir };
+  });
+  const lat = valores.find(v => v.dir === "N" || v.dir === "S");
+  const lng = valores.find(v => v.dir === "E" || v.dir === "W" || v.dir === "O");
+  if(!lat || !lng) return null;
+  return { lat: lat.valor.toFixed(6), lng: lng.valor.toFixed(6) };
+}
+
 /* coordenadas escondidas dentro de um link do Maps */
 const PADROES = [
   /@(-?\d+\.\d+),\s*(-?\d+\.\d+)/,
@@ -236,11 +256,37 @@ const PADROES = [
 ];
 el("link").addEventListener("input", () => {
   const v = el("link").value;
+  const dms = lerDms(v);
+  if(dms){
+    el("lat").value = dms.lat;
+    el("lng").value = dms.lng;
+    el("coordMsg").className = "msg";
+    el("coordMsg").textContent = "Convertido para " + dms.lat + ", " + dms.lng + ". Toque em buscar o endereço.";
+    return;
+  }
   for(const p of PADROES){
     const m = v.match(p);
     if(m){ el("lat").value = m[1]; el("lng").value = m[2]; return; }
   }
 });
+
+async function enderecoDasCoordenadas(){
+  const m = el("coordMsg");
+  if(!el("lat").value || !el("lng").value){
+    m.className="msg err"; m.textContent="Preencha latitude e longitude, ou cole as coordenadas no campo acima."; return;
+  }
+  m.className="msg wait"; m.textContent="Procurando o endereço deste ponto…";
+  try{
+    const d = await chamar({action:"traduzir", lat: el("lat").value, lng: el("lng").value});
+    if(d.ok && d.endereco){
+      el("endereco").value = d.endereco;
+      m.className="msg"; m.textContent="Endereço preenchido. Confira o texto e publique.";
+    }else{
+      m.className="msg err";
+      m.textContent = d.error || "O código da planilha está desatualizado — atualize o Apps Script.";
+    }
+  }catch(e){ m.className="msg err"; m.textContent="Não consegui falar com a planilha."; }
+}
 
 /* ------------------------- ações ----------------------------- */
 async function salvar(publicar){
